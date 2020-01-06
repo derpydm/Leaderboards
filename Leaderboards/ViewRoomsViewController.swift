@@ -201,6 +201,11 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
             self.present(pointsAlert, animated: true)
             
         }))
-        self.present(signAlert, animated: true)
+        
+        // Add cancel buttons
+        
+        signAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        pointsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        self.present(signAlert,animated: true)
     }
 }
