@@ -23,6 +23,7 @@
 		514A9E1923C2CEFF001C5E60 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514A9E1823C2CEFF001C5E60 /* Animations.swift */; };
 		514A9E1B23C2CF36001C5E60 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514A9E1A23C2CF36001C5E60 /* Animator.swift */; };
 		514A9E1D23C2CF62001C5E60 /* UITableView+IsLastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514A9E1C23C2CF62001C5E60 /* UITableView+IsLastCell.swift */; };
+		514A9E3223C32524001C5E60 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 514A9E3123C32524001C5E60 /* GoogleService-Info.plist */; };
 		5E4186AE532B5F4B10149589 /* Pods_Leaderboards.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 834FD9986FAC35126D6C7F95 /* Pods_Leaderboards.framework */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +46,7 @@
 		514A9E1823C2CEFF001C5E60 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		514A9E1A23C2CF36001C5E60 /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
 		514A9E1C23C2CF62001C5E60 /* UITableView+IsLastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+IsLastCell.swift"; sourceTree = "<group>"; };
+		514A9E3123C32524001C5E60 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6D862CCC750131230FC28514 /* Pods-Leaderboards.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Leaderboards.release.xcconfig"; path = "Target Support Files/Pods-Leaderboards/Pods-Leaderboards.release.xcconfig"; sourceTree = "<group>"; };
 		7EA85663AD18E9284D0AB629 /* Pods-Leaderboards.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Leaderboards.debug.xcconfig"; path = "Target Support Files/Pods-Leaderboards/Pods-Leaderboards.debug.xcconfig"; sourceTree = "<group>"; };
 		834FD9986FAC35126D6C7F95 /* Pods_Leaderboards.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Leaderboards.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,6 +91,7 @@
 				32959E0E236D8B7300230317 /* Main.storyboard */,
 				324B9FC7236E971500899D24 /* TeamLeaderboardsTableViewCell.swift */,
 				324B9FC9236EA8FB00899D24 /* Globals.swift */,
+				514A9E3123C32524001C5E60 /* GoogleService-Info.plist */,
 				324B9FC3236DE66300899D24 /* ViewRoomsViewController.swift */,
 				514A9E1823C2CEFF001C5E60 /* Animations.swift */,
 				514A9E1A23C2CF36001C5E60 /* Animator.swift */,
@@ -182,6 +185,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				32959E15236D8B7600230317 /* LaunchScreen.storyboard in Resources */,
+				514A9E3223C32524001C5E60 /* GoogleService-Info.plist in Resources */,
 				32959E12236D8B7600230317 /* Assets.xcassets in Resources */,
 				32959E10236D8B7300230317 /* Main.storyboard in Resources */,
 			);
@@ -394,7 +398,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_TEAM = XL5JK4F896;
 				INFOPLIST_FILE = Leaderboards/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -403,7 +406,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = sg.tk.boards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -415,7 +418,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_TEAM = XL5JK4F896;
 				INFOPLIST_FILE = Leaderboards/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -424,7 +426,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = sg.tk.boards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
