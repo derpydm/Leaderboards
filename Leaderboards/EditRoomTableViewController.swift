@@ -28,6 +28,7 @@ class EditRoomTableViewController: UITableViewController {
         codeLabel.text = room.code
         nameTextField.text = room.name
         maxScoreTextField.text = String(room.maxScore)
+        
         var groupText = ""
         let keys = groupNames!
         for (index,key) in keys.enumerated() {
@@ -100,7 +101,7 @@ class EditRoomTableViewController: UITableViewController {
         self.ref.child("rooms").child(code).updateChildValues(["name": newRoom.name, "code": newRoom.code, "groups": newRoom.groups, "maxScore": intMaxScore])
         
         // Go back to the room
-        dismiss(animated: true, completion: nil)
+        performSegue(withIdentifier: "backToRoom", sender: self)
     }
     // MARK: - Table view data source
     

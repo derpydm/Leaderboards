@@ -25,6 +25,9 @@ class NewRoomTableViewController: UITableViewController {
         
     }
     
+    @IBAction func cancelPressed(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
     func generateCode() -> Int {
         var isDupe = false
         // Generate code

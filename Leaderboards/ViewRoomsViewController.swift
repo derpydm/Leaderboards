@@ -10,7 +10,9 @@ import UIKit
 import FirebaseDatabase
 class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    @IBOutlet weak var subTitleTextLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var stackView: UIStackView!
     // Recieve room from another viewcontroller
     var room: Room!
     var shouldAnimate = true
@@ -37,7 +39,8 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                 self.shouldAnimate = true
                 // Check which value is changed
                 let value = snapshot.value!
-                let code = value as? String ?? self.room.code
+                // The code doesn't ever change for a single room so we don't touch it
+                let code = self.room.code
                 let name = value as? String ?? self.room.name
                 let groups = value as? [String:Int] ?? self.room.groups
                 let maxScore = value as? Int ?? self.room.maxScore
@@ -58,12 +61,18 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     func setUpTableView() {
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.alwaysBounceVertical = false
     }
     
     func setUpTitleLabel() {
-        titleLabel.text = room.name
+        self.navigationItem.title = room.name
+        self.navigationItem.backBarButtonItem?.title = room.name
+        subTitleTextLabel.text = "Room code: \(room.code)."
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: stackView)
     }
     
+    @IBAction func unwindToRoom(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
+    }
     func setUpGroups() {
         // Sort the values and match them with the names
         
@@ -80,7 +89,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     }
     
     @IBAction func dismissButtonPressed(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
+        performSegue(withIdentifier: "unwindToHomeFromRoom", sender: self)
     }
 
     // MARK: - Navigation
@@ -94,6 +103,12 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
             dest.room = room
             dest.groupNames = groupNames
             dest.scores = groupScores
+        } else if segue.identifier == "unwindToHomeFromRoom" {
+            let dest = segue.destination as! HomeTableViewController
+            dest.roomGroups.removeAll()
+            dest.roomNames.removeAll()
+            dest.roomCodes.removeAll()
+            dest.collectionView.reloadData()
         }
     }
     
@@ -138,9 +153,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var sign = 1
         let signAlert = UIAlertController(title: "Changing Points", message: "Are you adding or subtracting points?", preferredStyle: .actionSheet)
-        
-        
-        
+        signAlert.popoverPresentationController?.sourceView = tableView.cellForRow(at: indexPath)
         // We establish the points alert now so we can display it after the signAlert
         // Title and message will be added later
         let pointsAlert = UIAlertController(title: "", message: "", preferredStyle: .alert)
@@ -162,9 +175,9 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                         
                         let errAlert = UIAlertController(title: "Error", message: "The value is too large! Scores must be below \(self.room.maxScore).", preferredStyle: .alert)
                         errAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-
                         self.present(errAlert, animated: true)
                     } else {
+                        print(self.room.code)
                         // Update score and then save it in Firebase
                         self.groupScores[indexPath.row] = newIntScore
                         let newDict = Dictionary(uniqueKeysWithValues: zip(self.groupNames, self.groupScores))

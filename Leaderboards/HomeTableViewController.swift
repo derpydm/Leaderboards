@@ -81,12 +81,14 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
         let actionSheet = UIAlertController(title: "Delete Room", message: "Deleting this room will remove it permanently. Are you sure?", preferredStyle: .actionSheet)
         if let index = indexPath {
             // do stuff with your cell, for example print the indexPath
+            actionSheet.popoverPresentationController?.sourceView = collectionView.cellForItem(at: index)
+            haptics.impactOccurred()
             actionSheet.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { (action) in
                 let row = index.row
                 self.ref.child("rooms").child(self.roomCodes[row]).removeValue()
-                self.roomNames.remove(at: index.row)
-                self.roomGroups.remove(at: index.row)
-                self.roomCodes.remove(at: index.row)
+                self.roomNames.remove(at: row)
+                self.roomGroups.remove(at: row)
+                self.roomCodes.remove(at: row)
                 self.shouldAnimate = true
                 self.collectionView.reloadData()
             }))
@@ -96,7 +98,6 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
         }
     }
     @IBAction func unwindToHome(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
-        
         // Check for rooms again
         
         ref.child("rooms").observeSingleEvent(of: .value) { (snapshot) in
@@ -155,7 +156,7 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 4
+        return 3
     }
     
     // MARK: - CollectionView Datasource
@@ -220,7 +221,8 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showRoom" {
             // make a new instance of
-            let dest = segue.destination as! ViewRoomsViewController
+            let nav = segue.destination as! UINavigationController
+            let dest = nav.viewControllers[0] as! ViewRoomsViewController
             dest.room = sentRoom
         }
         // Get the new view controller using segue.destination.
