@@ -10,6 +10,8 @@ import UIKit
 import FirebaseDatabase
 class NewRoomTableViewController: UITableViewController {
     var ref: DatabaseReference!
+    var groupText: String!
+    var groupNames: String!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var maxScoreTextField: UITextField!
     @IBOutlet weak var codeLabel: UILabel!
@@ -17,16 +19,17 @@ class NewRoomTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         ref = Database.database().reference()
-        
+        tableView.allowsSelection = true
         let code = generateCode()
         codeLabel.text = String(code)
-        // Test of reading stuff from Firebase
-        
-        
     }
     
     @IBAction func cancelPressed(_ sender: Any) {
         dismiss(animated: true, completion: nil)
+    }
+    func reloadGroupText() {
+        
+        groupNamesTextField.attributedText = coloredCommas(with: groupText)
     }
     func generateCode() -> Int {
         var isDupe = false
@@ -43,7 +46,23 @@ class NewRoomTableViewController: UITableViewController {
         }
         return code
     }
+    @IBAction func backToNewRoom(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
+        reloadGroupText()
+    }
     
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        if indexPath.row != 2 {
+            return nil
+        }
+        return indexPath
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == 2 {
+            tableView.deselectRow(at: indexPath, animated: true)
+            performSegue(withIdentifier: "newRoomEditGroups", sender: self)
+        }
+    }
     @IBAction func createNewRoom(_ sender: Any) {
         
         // If name or groupnames are missing, then warn user and do not proceed

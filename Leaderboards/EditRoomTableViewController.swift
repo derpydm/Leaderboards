@@ -16,13 +16,14 @@ class EditRoomTableViewController: UITableViewController {
     var room: Room!
     var groupNames: [String]!
     var scores: [Int]!
+    var groupText: String!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var codeLabel: UILabel!
     @IBOutlet weak var maxScoreTextField: UITextField!
     @IBOutlet weak var groupNamesTextField: UITextField!
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        tableView.allowsSelection = true
         ref = Database.database().reference()
         
         codeLabel.text = room.code
@@ -39,8 +40,31 @@ class EditRoomTableViewController: UITableViewController {
             }
         }
         groupNamesTextField.attributedText = coloredCommas(with: groupText)
+        
     }
     
+    func reloadGroupText() {
+        groupNamesTextField.attributedText = coloredCommas(with: groupText)
+    }
+    
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        if indexPath.row != 2 {
+            return nil
+        }
+        return indexPath
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == 2 {
+            tableView.deselectRow(at: indexPath, animated: true)
+            performSegue(withIdentifier: "editRoomEditGroups", sender: self)
+        }
+    }
+    
+    @IBAction func backToEdit(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
+        reloadGroupText()
+        
+    }
     @IBAction func updateNewRoom(_ sender: Any) {
         
         // If name or groupnames are missing, then warn user and do not proceed
@@ -85,7 +109,6 @@ class EditRoomTableViewController: UITableViewController {
         let oldGroups = Dictionary(uniqueKeysWithValues: zip(self.groupNames, scores))
         var groups: [String:Int] = [:]
         for name in groupNamesArray {
-            print("\(name): \(oldGroups[name])")
             if ((oldGroups[name] ?? 0) == 0) {
                 groups.updateValue(0, forKey: name)
             } else {
@@ -119,14 +142,22 @@ class EditRoomTableViewController: UITableViewController {
         sender.attributedText = coloredCommas(with: sender.text ?? "")
     }
     
-    /*
+
      // MARK: - Navigation
      
      // In a storyboard-based application, you will often want to do a little preparation before navigation
      override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
      // Get the new view controller using segue.destination.
      // Pass the selected object to the new view controller.
-     }
-     */
+        if segue.identifier == "editRoomEditGroups" {
+            let nav = segue.destination as! UINavigationController
+                 let dest = nav.viewControllers[0] as! EditGroupsTableViewController
+            dest.identifier = "editGroups"
+            dest.names = groupNames
+        }
+     
+        
+    }
+
     
 }

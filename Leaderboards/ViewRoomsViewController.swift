@@ -15,10 +15,11 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     @IBOutlet weak var stackView: UIStackView!
     // Recieve room from another viewcontroller
     var room: Room!
-    var shouldAnimate = true
+    var shouldAnimate = false
     var groupScores: [Int]! = []
     var groupNames: [String]! = []
     var ref: DatabaseReference!
+    var doNotAnimate: [IndexPath:Bool] = [:]
     @IBOutlet weak var titleLabel: UILabel!
     
     override func viewDidLoad() {
@@ -29,7 +30,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         setUpGroups()
         setUpTitleLabel()
         
-       // Set up Firebase listener
+        // Set up Firebase listener
         
         self.ref = Database.database().reference()
         ref.child("rooms").child(room.code).observe(.childChanged) { (snapshot) in
@@ -50,6 +51,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                 self.room = newRoom
                 self.setUpGroups()
                 self.setUpTitleLabel()
+                self.doNotAnimate.removeAll()
                 self.tableView.reloadData()
             }
         }
@@ -58,6 +60,15 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         print("Room \(room.code) with name \(room.name) and groups \(groupNames)")
         
     }
+    func getTableViewCellIndexPaths(sectionIndex: Int = 0) {
+        var reloadPaths = [IndexPath]()
+        (0..<tableView.numberOfRows(inSection: sectionIndex)).indices.forEach { rowIndex in
+            let indexPath = IndexPath(row: rowIndex, section: sectionIndex)
+            reloadPaths.append(indexPath)
+        }
+        tableView.reloadRows(at: reloadPaths, with: .automatic)
+    }
+    
     func setUpTableView() {
         tableView.dataSource = self
         tableView.delegate = self
@@ -91,9 +102,9 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     @IBAction func dismissButtonPressed(_ sender: Any) {
         performSegue(withIdentifier: "unwindToHomeFromRoom", sender: self)
     }
-
+    
     // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
@@ -139,14 +150,16 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         // We animate the cells here.
         // We only want the animation to play at first and when the view updates.
-        if shouldAnimate {
-            let animation = AnimationFactory.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 1.0, delayFactor: 0.2)
-            let animator = Animator(animation: animation)
-            animator.animate(cell: cell, at: indexPath, in: tableView)
+        if let _ = doNotAnimate[indexPath] {
+            return
         }
-        if shouldAnimate && tableView.isLastVisibleCell(at: indexPath) {
-            shouldAnimate = false
-        }
+        
+        doNotAnimate[indexPath] = true
+        let animation = AnimationFactory.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 1.0, delayFactor: 0.2)
+        let animator = Animator(animation: animation)
+        animator.animate(cell: cell, at: indexPath, in: tableView)
+        
+        
         
     }
     // MARK: - Table view delegate
@@ -165,7 +178,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                 let textField = pointsAlert.textFields![0]
                 let newScore = textField.text ?? "0"
                 
-                    
+                
                 if var newIntScore = Int(newScore) {
                     // Apply sign then add the original score
                     newIntScore = newIntScore * sign

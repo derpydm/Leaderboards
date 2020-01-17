@@ -10,7 +10,6 @@
 		324B9FBC236DB64200899D24 /* HomeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FBB236DB64200899D24 /* HomeTableViewController.swift */; };
 		324B9FBE236DBB8900899D24 /* NewRoomTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FBD236DBB8900899D24 /* NewRoomTableViewController.swift */; };
 		324B9FC0236DDCA000899D24 /* MyRoomsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FBF236DDCA000899D24 /* MyRoomsCollectionViewCell.swift */; };
-		324B9FC2236DE63C00899D24 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FC1236DE63C00899D24 /* Extensions.swift */; };
 		324B9FC4236DE66300899D24 /* ViewRoomsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FC3236DE66300899D24 /* ViewRoomsViewController.swift */; };
 		324B9FC8236E971600899D24 /* TeamLeaderboardsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FC7236E971500899D24 /* TeamLeaderboardsTableViewCell.swift */; };
 		324B9FCA236EA8FB00899D24 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FC9236EA8FB00899D24 /* Globals.swift */; };
@@ -24,6 +23,7 @@
 		514A9E1B23C2CF36001C5E60 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514A9E1A23C2CF36001C5E60 /* Animator.swift */; };
 		514A9E1D23C2CF62001C5E60 /* UITableView+IsLastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514A9E1C23C2CF62001C5E60 /* UITableView+IsLastCell.swift */; };
 		514A9E3223C32524001C5E60 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 514A9E3123C32524001C5E60 /* GoogleService-Info.plist */; };
+		5178892F23D18F80000E7EE6 /* EditGroupsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5178892E23D18F80000E7EE6 /* EditGroupsTableViewController.swift */; };
 		5E4186AE532B5F4B10149589 /* Pods_Leaderboards.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 834FD9986FAC35126D6C7F95 /* Pods_Leaderboards.framework */; };
 /* End PBXBuildFile section */
 
@@ -31,7 +31,6 @@
 		324B9FBB236DB64200899D24 /* HomeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTableViewController.swift; sourceTree = "<group>"; };
 		324B9FBD236DBB8900899D24 /* NewRoomTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRoomTableViewController.swift; sourceTree = "<group>"; };
 		324B9FBF236DDCA000899D24 /* MyRoomsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyRoomsCollectionViewCell.swift; sourceTree = "<group>"; };
-		324B9FC1236DE63C00899D24 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		324B9FC3236DE66300899D24 /* ViewRoomsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewRoomsViewController.swift; sourceTree = "<group>"; };
 		324B9FC7236E971500899D24 /* TeamLeaderboardsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamLeaderboardsTableViewCell.swift; sourceTree = "<group>"; };
 		324B9FC9236EA8FB00899D24 /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
@@ -42,11 +41,13 @@
 		32959E11236D8B7600230317 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		32959E14236D8B7600230317 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		32959E16236D8B7600230317 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5122078823C6D0DB00E463A3 /* Leaderboards.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Leaderboards.entitlements; sourceTree = "<group>"; };
 		513E5BCD23BDD5DC001B3A1B /* EditRoomTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditRoomTableViewController.swift; sourceTree = "<group>"; };
 		514A9E1823C2CEFF001C5E60 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		514A9E1A23C2CF36001C5E60 /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
 		514A9E1C23C2CF62001C5E60 /* UITableView+IsLastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+IsLastCell.swift"; sourceTree = "<group>"; };
 		514A9E3123C32524001C5E60 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		5178892E23D18F80000E7EE6 /* EditGroupsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGroupsTableViewController.swift; sourceTree = "<group>"; };
 		6D862CCC750131230FC28514 /* Pods-Leaderboards.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Leaderboards.release.xcconfig"; path = "Target Support Files/Pods-Leaderboards/Pods-Leaderboards.release.xcconfig"; sourceTree = "<group>"; };
 		7EA85663AD18E9284D0AB629 /* Pods-Leaderboards.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Leaderboards.debug.xcconfig"; path = "Target Support Files/Pods-Leaderboards/Pods-Leaderboards.debug.xcconfig"; sourceTree = "<group>"; };
 		834FD9986FAC35126D6C7F95 /* Pods_Leaderboards.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Leaderboards.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,6 +86,7 @@
 		32959E07236D8B7300230317 /* Leaderboards */ = {
 			isa = PBXGroup;
 			children = (
+				5122078823C6D0DB00E463A3 /* Leaderboards.entitlements */,
 				32959E08236D8B7300230317 /* AppDelegate.swift */,
 				32959E0A236D8B7300230317 /* SceneDelegate.swift */,
 				324B9FBD236DBB8900899D24 /* NewRoomTableViewController.swift */,
@@ -97,9 +99,9 @@
 				514A9E1A23C2CF36001C5E60 /* Animator.swift */,
 				514A9E1C23C2CF62001C5E60 /* UITableView+IsLastCell.swift */,
 				513E5BCD23BDD5DC001B3A1B /* EditRoomTableViewController.swift */,
-				324B9FC1236DE63C00899D24 /* Extensions.swift */,
 				324B9FBF236DDCA000899D24 /* MyRoomsCollectionViewCell.swift */,
 				324B9FBB236DB64200899D24 /* HomeTableViewController.swift */,
+				5178892E23D18F80000E7EE6 /* EditGroupsTableViewController.swift */,
 				32959E11236D8B7600230317 /* Assets.xcassets */,
 				32959E13236D8B7600230317 /* LaunchScreen.storyboard */,
 				32959E16236D8B7600230317 /* Info.plist */,
@@ -248,11 +250,11 @@
 				324B9FC8236E971600899D24 /* TeamLeaderboardsTableViewCell.swift in Sources */,
 				324B9FBE236DBB8900899D24 /* NewRoomTableViewController.swift in Sources */,
 				324B9FBC236DB64200899D24 /* HomeTableViewController.swift in Sources */,
-				324B9FC2236DE63C00899D24 /* Extensions.swift in Sources */,
 				324B9FC4236DE66300899D24 /* ViewRoomsViewController.swift in Sources */,
 				514A9E1D23C2CF62001C5E60 /* UITableView+IsLastCell.swift in Sources */,
 				514A9E1923C2CEFF001C5E60 /* Animations.swift in Sources */,
 				324B9FCA236EA8FB00899D24 /* Globals.swift in Sources */,
+				5178892F23D18F80000E7EE6 /* EditGroupsTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,7 +399,10 @@
 			baseConfigurationReference = 7EA85663AD18E9284D0AB629 /* Pods-Leaderboards.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Leaderboards/Leaderboards.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_TEAM = XL5JK4F896;
 				INFOPLIST_FILE = Leaderboards/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -406,7 +411,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = sg.tk.boards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -417,7 +422,10 @@
 			baseConfigurationReference = 6D862CCC750131230FC28514 /* Pods-Leaderboards.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Leaderboards/Leaderboards.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_TEAM = XL5JK4F896;
 				INFOPLIST_FILE = Leaderboards/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -426,7 +434,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = sg.tk.boards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
