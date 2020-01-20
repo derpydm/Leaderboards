@@ -19,6 +19,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     var groupScores: [Int]! = []
     var groupNames: [String]! = []
     var ref: DatabaseReference!
+    var roomRef: DatabaseReference!
     var doNotAnimate: [IndexPath:Bool] = [:]
     @IBOutlet weak var titleLabel: UILabel!
     
@@ -33,7 +34,8 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         // Set up Firebase listener
         
         self.ref = Database.database().reference()
-        ref.child("rooms").child(room.code).observe(.childChanged) { (snapshot) in
+        self.roomRef = ref.child("rooms").child(room.code)
+        roomRef.observe(.childChanged) { (snapshot) in
             print(snapshot)
             if snapshot.exists() {
                 // Inform tableView that it is ok to animate now
@@ -175,12 +177,14 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         }
         pointsAlert.addAction(UIAlertAction(title: "Update Points", style: .default, handler: { (action) in
             pointsAlert.dismiss(animated: true) {
+                
                 let textField = pointsAlert.textFields![0]
                 let newScore = textField.text ?? "0"
                 
                 
                 if var newIntScore = Int(newScore) {
                     // Apply sign then add the original score
+                    let change = newIntScore
                     newIntScore = newIntScore * sign
                     newIntScore += self.groupScores[indexPath.row]
                     // Check if it exceeds the max score points
@@ -190,11 +194,43 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                         errAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                         self.present(errAlert, animated: true)
                     } else {
-                        print(self.room.code)
-                        // Update score and then save it in Firebase
-                        self.groupScores[indexPath.row] = newIntScore
-                        let newDict = Dictionary(uniqueKeysWithValues: zip(self.groupNames, self.groupScores))
-                        self.ref.child("rooms").child(self.room.code).child("groups").setValue(newDict)
+                        // Save the reason in the log
+                        
+                        var reason = ""
+                        let reasonAlert = UIAlertController(title: "Reason for Update", message: "Provide a reason for this update", preferredStyle: .alert)
+                        reasonAlert.addTextField { (textField) in
+                            textField.placeholder = "Reason"
+                        }
+                        reasonAlert.addAction(UIAlertAction(title: "Update", style: .default, handler: { _ in
+                            let textField = reasonAlert.textFields![0]
+                            reason = textField.text ?? "no reason provided"
+                            let formatter = DateFormatter()
+                            formatter.dateFormat = "MMM d, hh:mm"
+                            let date = formatter.string(from: Date())
+                            
+                            // Get the log and update it - we only need to display in another view controller so we don't have to update values in this VC
+                            let newLog = ["points": String(change), "date": date, "reason": reason]
+                            self.roomRef.child("log").observeSingleEvent(of: .value) { (snapshot) in
+                                if snapshot.exists() {
+                                    let value = snapshot.value as? NSArray
+                                    self.roomRef.child("log").child(String(value!.count)).setValue(newLog)
+                                } else {
+                                    self.roomRef.child("log").child("0").setValue(newLog)
+                                }
+
+                                    
+
+                                
+                            }
+                            // Update score and then save it in Firebase
+                            self.groupScores[indexPath.row] = newIntScore
+                            let newDict = Dictionary(uniqueKeysWithValues: zip(self.groupNames, self.groupScores))
+                            self.roomRef.child("groups").setValue(newDict)
+
+                        }))
+                        self.present(reasonAlert, animated: true)
+                    
+                        
                     }
                     
                 } else {
