@@ -62,6 +62,8 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         print("Room \(room.code) with name \(room.name) and groups \(groupNames)")
         
     }
+    
+    // Unused function
     func getTableViewCellIndexPaths(sectionIndex: Int = 0) {
         var reloadPaths = [IndexPath]()
         (0..<tableView.numberOfRows(inSection: sectionIndex)).indices.forEach { rowIndex in
@@ -207,9 +209,9 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                             // Implement as ISO string and then format on client itself?
                             formatter.dateFormat = "MMM d, hh:mm"
                             let date = formatter.string(from: Date())
-                            
+                            let groupName = self.groupNames[indexPath.row]
                             // Get the log and update it - we only need to display in another view controller so we don't have to update values in this VC
-                            let newLog = ["points": String(change), "date": date, "reason": reason]
+                            let newLog = ["change": String(change), "date": date, "reason": reason, "group": groupName]
                             self.roomRef.child("log").observeSingleEvent(of: .value) { (snapshot) in
                                 if snapshot.exists() {
                                     let value = snapshot.value as? NSArray
