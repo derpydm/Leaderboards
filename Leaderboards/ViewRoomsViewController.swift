@@ -140,9 +140,8 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         cell.scoreLabel.text = String(groupScores[indexPath.row])
         
         // Update progress indicator
-        let maxWidth = UIScreen.main.bounds.width
-        let segmentWidth = maxWidth / CGFloat(room.maxScore)
-        cell.editProgressIndicatorWidthContraint.constant = segmentWidth * CGFloat(groupScores[indexPath.row])
+        let maxWidth = cell.coloredBackground.frame.width
+        cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(groupScores[indexPath.row])/CGFloat(room.maxScore)
         
         // Set up group name
         cell.groupNameLabel.text = groupNames[indexPath.row]
@@ -205,6 +204,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                             let textField = reasonAlert.textFields![0]
                             reason = textField.text ?? "no reason provided"
                             let formatter = DateFormatter()
+                            // Implement as ISO string and then format on client itself?
                             formatter.dateFormat = "MMM d, hh:mm"
                             let date = formatter.string(from: Date())
                             
@@ -217,12 +217,9 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                                 } else {
                                     self.roomRef.child("log").child("0").setValue(newLog)
                                 }
-
-                                    
-
-                                
                             }
                             // Update score and then save it in Firebase
+                            #warning("Implement a LCS (longest common subsequence) algo and then use it instead")
                             self.groupScores[indexPath.row] = newIntScore
                             let newDict = Dictionary(uniqueKeysWithValues: zip(self.groupNames, self.groupScores))
                             self.roomRef.child("groups").setValue(newDict)
