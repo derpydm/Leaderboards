@@ -30,6 +30,8 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         setUpTableView()
         setUpGroups()
         setUpTitleLabel()
+        NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
+        tableView.reloadData()
         
         // Set up Firebase listener
         
@@ -58,9 +60,24 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
             }
         }
         
+            
+        
         // Debug
         print("Room \(room.code) with name \(room.name) and groups \(groupNames)")
         
+    }
+    deinit {
+       NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
+    }
+    
+    @objc func rotated() {
+        // Re-dequeue cells and layout everything again
+        tableView.reloadData()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        tableView.reloadData()
     }
     
     // Unused function
@@ -77,6 +94,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         tableView.dataSource = self
         tableView.delegate = self
         tableView.alwaysBounceVertical = false
+        
     }
     
     func setUpTitleLabel() {
@@ -134,7 +152,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "team", for: indexPath) as! TeamLeaderboardsTableViewCell
-        
+        cell.contentView.layoutIfNeeded()
         cell.selectionStyle = .none
         // Set up labels
         cell.groupRankLabel.text = String(indexPath.row + 1)
@@ -157,6 +175,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
             return
         }
         
+        
         doNotAnimate[indexPath] = true
         let animation = AnimationFactory.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 1.0, delayFactor: 0.2)
         let animator = Animator(animation: animation)
@@ -175,6 +194,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         let pointsAlert = UIAlertController(title: "", message: "", preferredStyle: .alert)
         pointsAlert.addTextField { (textField) in
             textField.placeholder = "Points"
+            textField.keyboardType = .numberPad
         }
         pointsAlert.addAction(UIAlertAction(title: "Update Points", style: .default, handler: { (action) in
             pointsAlert.dismiss(animated: true) {
@@ -186,6 +206,11 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                 if var newIntScore = Int(newScore) {
                     // Apply sign then add the original score
                     let change = newIntScore
+                    if newIntScore < 0 {
+                        let errAlert = UIAlertController(title: "Error", message: "You entered in a negative value! Enter in a value above 0.", preferredStyle: .alert)
+                        errAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                        self.present(errAlert, animated: true)
+                    }
                     newIntScore = newIntScore * sign
                     newIntScore += self.groupScores[indexPath.row]
                     // Check if it exceeds the max score points
@@ -206,8 +231,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                             let textField = reasonAlert.textFields![0]
                             reason = textField.text ?? "no reason provided"
                             let formatter = DateFormatter()
-                            // Implement as ISO string and then format on client itself?
-                            formatter.dateFormat = "MMM d, hh:mm"
+                            formatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
                             let date = formatter.string(from: Date())
                             let groupName = self.groupNames[indexPath.row]
                             // Get the log and update it - we only need to display in another view controller so we don't have to update values in this VC

@@ -23,11 +23,10 @@ class TeamLeaderboardsTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        
         coloredBackground.layer.cornerRadius = 12
         coloredBackground.clipsToBounds = true
     }
-
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
