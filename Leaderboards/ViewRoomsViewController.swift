@@ -59,9 +59,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                 self.tableView.reloadData()
             }
         }
-        
             
-        
         // Debug
         print("Room \(room.code) with name \(room.name) and groups \(groupNames)")
         
@@ -165,7 +163,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         
         // Set up group name
         cell.groupNameLabel.text = groupNames[indexPath.row]
-        
+        cell.alpha = 0
         return cell
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -174,16 +172,23 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         if let _ = doNotAnimate[indexPath] {
             return
         }
-        
-        
+
+
         doNotAnimate[indexPath] = true
-        let animation = AnimationFactory.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 1.0, delayFactor: 0.2)
-        let animator = Animator(animation: animation)
+        let fadeOut = AnimationFactory.makeFadeOut(duration: 0.25, delayFactor: 0.1)
+        let slideIn = AnimationFactory.makeSlideIn(duration: 1, delayFactor: 0.3)
+        let animator = Animator(animation: fadeOut)
+        let animator2 = Animator(animation: slideIn)
         animator.animate(cell: cell, at: indexPath, in: tableView)
-        
-        
-        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            animator2.animate(cell: cell, at: indexPath, in: tableView)
+        }
+            
+
+
     }
+    
+    
     // MARK: - Table view delegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var sign = 1
@@ -227,6 +232,8 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                         reasonAlert.addTextField { (textField) in
                             textField.placeholder = "Reason"
                         }
+                       
+                            
                         reasonAlert.addAction(UIAlertAction(title: "Update", style: .default, handler: { _ in
                             let textField = reasonAlert.textFields![0]
                             reason = textField.text ?? "no reason provided"
@@ -251,6 +258,32 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                             self.roomRef.child("groups").setValue(newDict)
 
                         }))
+                        
+                        reasonAlert.addAction(UIAlertAction(title: "Update without Reason", style: .default, handler: { _ in
+                                                       reason = "no reason provided"
+                                                       let formatter = DateFormatter()
+                                                       formatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
+                                                       let date = formatter.string(from: Date())
+                                                       let groupName = self.groupNames[indexPath.row]
+                                                       
+                                                       // Get the log and update it - we only need to display in another view controller so we don't have to update values in this VC
+                                                       let newLog = ["change": String(change), "date": date, "reason": reason, "group": groupName]
+                                                       self.roomRef.child("log").observeSingleEvent(of: .value) { (snapshot) in
+                                                           if snapshot.exists() {
+                                                               let value = snapshot.value as? NSArray
+                                                               self.roomRef.child("log").child(String(value!.count)).setValue(newLog)
+                                                           } else {
+                                                               self.roomRef.child("log").child("0").setValue(newLog)
+                                                           }
+                                                       }
+                                                       // Update score and then save it in Firebase
+                                                       #warning("Implement a LCS (longest common subsequence) algo and then use it instead")
+                                                       self.groupScores[indexPath.row] = newIntScore
+                                                       let newDict = Dictionary(uniqueKeysWithValues: zip(self.groupNames, self.groupScores))
+                                                       self.roomRef.child("groups").setValue(newDict)
+
+                                                   }))
+                        
                         self.present(reasonAlert, animated: true)
                     
                         

@@ -25,6 +25,28 @@ class Room: Codable {
     }
 }
 
+struct Group: Codable, Comparable, Equatable {
+    
+    static func == (lhs: Group, rhs: Group) -> Bool {
+        return lhs.score == rhs.score && lhs.name == rhs.name
+    }
+    static func < (lhs: Group, rhs: Group) -> Bool {
+        return lhs.score < rhs.score
+    }
+    static func > (lhs: Group, rhs: Group) -> Bool {
+        return lhs.score > rhs.score
+    }
+    
+    init(_ name: String, _ score: Int) {
+        self.name = name
+        self.score = score
+    }
+    var name: String
+    var score: Int
+}
+
+
+
 func coloredCommas(with string: String) -> NSAttributedString {
     let mutableString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.font : UIFont.boldSystemFont(ofSize: 18), NSAttributedString.Key.foregroundColor : #colorLiteral(red: 0.184713006, green: 0.2980033159, blue: 0.5609270334, alpha: 1)])
     let colorAttribute = [NSAttributedString.Key.foregroundColor : #colorLiteral(red: 0.6019130945, green: 0.7103144526, blue: 1, alpha: 1)]

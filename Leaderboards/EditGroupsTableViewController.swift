@@ -41,6 +41,7 @@ class EditGroupsTableViewController: UITableViewController {
         alert.addTextField { (textField) in
             textField.placeholder = "Name"
         }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { (_) in
             let textField = alert.textFields?[0]
             guard let text = textField?.text else {

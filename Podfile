@@ -7,4 +7,5 @@ target 'Leaderboards' do
 
   # Pods for Leaderboards
   pod 'Firebase/Database'
+  pod 'SwiftLCS'
 end

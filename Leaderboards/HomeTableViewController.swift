@@ -83,6 +83,7 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
             // do stuff with your cell, for example print the indexPath
             actionSheet.popoverPresentationController?.sourceView = collectionView.cellForItem(at: index)
             haptics.impactOccurred()
+            actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             actionSheet.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { (action) in
                 let row = index.row
                 self.ref.child("rooms").child(self.roomCodes[row]).removeValue()
