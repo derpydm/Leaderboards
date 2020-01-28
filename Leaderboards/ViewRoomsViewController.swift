@@ -159,6 +159,9 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         
         // Update progress indicator
         let maxWidth = cell.coloredBackground.frame.width
+        let greenComponent = #colorLiteral(red: 0.4666666667, green: 0.8666666667, blue: 0.4666666667, alpha: 1).withAlphaComponent(CGFloat(groupScores[indexPath.row]) / CGFloat(room.maxScore))
+        let redComponent = #colorLiteral(red: 1, green: 0.4117647059, blue: 0.3803921569, alpha: 1).withAlphaComponent((CGFloat(room.maxScore - groupScores[indexPath.row]) / CGFloat(room.maxScore)))
+        cell.progressIndicator.backgroundColor = greenComponent + redComponent
         cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(groupScores[indexPath.row])/CGFloat(room.maxScore)
         
         // Set up group name
@@ -276,6 +279,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                                                                self.roomRef.child("log").child("0").setValue(newLog)
                                                            }
                                                        }
+                            
                                                        // Update score and then save it in Firebase
                                                        #warning("Implement a LCS (longest common subsequence) algo and then use it instead")
                                                        self.groupScores[indexPath.row] = newIntScore
@@ -285,8 +289,6 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                                                    }))
                         
                         self.present(reasonAlert, animated: true)
-                    
-                        
                     }
                     
                 } else {
