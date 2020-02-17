@@ -1,4 +1,5 @@
 PODS:
+  - DeepDiff (2.3.1)
   - Firebase/CoreOnly (6.14.0):
     - FirebaseCore (= 6.5.0)
   - Firebase/Database (6.14.0):
@@ -34,16 +35,14 @@ PODS:
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
-  - SwiftLCS (1.3.4):
-    - SwiftLCS/Core (= 1.3.4)
-  - SwiftLCS/Core (1.3.4)
 
 DEPENDENCIES:
+  - DeepDiff
   - Firebase/Database
-  - SwiftLCS
 
 SPEC REPOS:
   trunk:
+    - DeepDiff
     - Firebase
     - FirebaseAuthInterop
     - FirebaseCore
@@ -55,9 +54,9 @@ SPEC REPOS:
     - GoogleUtilities
     - leveldb-library
     - nanopb
-    - SwiftLCS
 
 SPEC CHECKSUMS:
+  DeepDiff: e5ae6c50d0321568e4508cec5930b9f10bb293fc
   Firebase: 0219bb4782eb1406f1b9b0628a2e625484ce910d
   FirebaseAuthInterop: 0ffa57668be100582bb7643d4fcb7615496c41fc
   FirebaseCore: 632e05cc5e1199d9147122c16d92305eb04c34bd
@@ -69,8 +68,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 29bd0d8f850efbd28cff6d99e8b7da1f8d236bcf
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
-  SwiftLCS: e4570005248eb9dccf6d0f1e67d37a9cdaa332d7
 
-PODFILE CHECKSUM: cef95e874cecc1eeb654d133bca6f88fb40eb91e
+PODFILE CHECKSUM: a07ceff2d50266eaf6cb9bcb6b61de036849bbc5
 
 COCOAPODS: 1.8.4
