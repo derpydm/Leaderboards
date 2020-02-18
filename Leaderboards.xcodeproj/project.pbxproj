@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A4A515823FA2EC1000B095D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1A4A515723FA2EC1000B095D /* GoogleService-Info.plist */; };
 		324B9FBC236DB64200899D24 /* HomeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FBB236DB64200899D24 /* HomeTableViewController.swift */; };
 		324B9FBE236DBB8900899D24 /* NewRoomTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FBD236DBB8900899D24 /* NewRoomTableViewController.swift */; };
 		324B9FC0236DDCA000899D24 /* MyRoomsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FBF236DDCA000899D24 /* MyRoomsCollectionViewCell.swift */; };
@@ -29,6 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1A4A515723FA2EC1000B095D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		324B9FBB236DB64200899D24 /* HomeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTableViewController.swift; sourceTree = "<group>"; };
 		324B9FBD236DBB8900899D24 /* NewRoomTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRoomTableViewController.swift; sourceTree = "<group>"; };
 		324B9FBF236DDCA000899D24 /* MyRoomsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyRoomsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 				324B9FC7236E971500899D24 /* TeamLeaderboardsTableViewCell.swift */,
 				324B9FC9236EA8FB00899D24 /* Globals.swift */,
 				514A9E3123C32524001C5E60 /* GoogleService-Info.plist */,
+				1A4A515723FA2EC1000B095D /* GoogleService-Info.plist */,
 				324B9FC3236DE66300899D24 /* ViewRoomsViewController.swift */,
 				514A9E1823C2CEFF001C5E60 /* Animations.swift */,
 				514A9E1A23C2CF36001C5E60 /* Animator.swift */,
@@ -191,6 +194,7 @@
 			files = (
 				32959E15236D8B7600230317 /* LaunchScreen.storyboard in Resources */,
 				514A9E3223C32524001C5E60 /* GoogleService-Info.plist in Resources */,
+				1A4A515823FA2EC1000B095D /* GoogleService-Info.plist in Resources */,
 				32959E12236D8B7600230317 /* Assets.xcassets in Resources */,
 				32959E10236D8B7300230317 /* Main.storyboard in Resources */,
 			);

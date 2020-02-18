@@ -8,9 +8,10 @@
 
 import Foundation
 import UIKit
+import DeepDiff
 
 class Room: Codable {
-    init(name: String, code: String, groups: [String:Int], maxScore: Int) {
+    init(name: String, code: String, groups: [Group], maxScore: Int) {
         self.name = name
         self.code = code
         self.groups = groups
@@ -18,24 +19,21 @@ class Room: Codable {
     }
     var name: String
     var code: String
-    var groups: [String:Int]
+    var groups: [Group]
     var maxScore: Int = 1000
-    func encode() {
-        
-    }
 }
 
-struct Group: Codable, Comparable, Equatable {
+struct Group: Codable, DiffAware {
+    var diffId: DiffId {
+        self.name
+    }
+    		
+    static func compareContent(_ a: Group, _ b: Group) -> Bool {
+        return a.score == b.score
+    }
     
-    static func == (lhs: Group, rhs: Group) -> Bool {
-        return lhs.score == rhs.score && lhs.name == rhs.name
-    }
-    static func < (lhs: Group, rhs: Group) -> Bool {
-        return lhs.score < rhs.score
-    }
-    static func > (lhs: Group, rhs: Group) -> Bool {
-        return lhs.score > rhs.score
-    }
+    typealias DiffId = String
+    
     
     init(_ name: String, _ score: Int) {
         self.name = name
