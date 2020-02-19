@@ -190,7 +190,6 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     
     // MARK: - Table view delegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        #warning("clean this up later and combine points/reason alert")
         var sign = 1
         let signAlert = UIAlertController(title: "Edit Points", message: "Do you want to add or subtract points?", preferredStyle: .actionSheet)
         let pointsAlert = UIAlertController(title: "Points to Add", message: "How many points would you like to add?", preferredStyle: .alert)

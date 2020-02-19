@@ -98,7 +98,7 @@ class EditRoomTableViewController: UITableViewController {
         if maxScore == "" {
             maxScore = "1000"
         }
-        guard let intMaxScore = Int(maxScore) else {
+        guard Int(maxScore) != nil else {
             let alert = UIAlertController(title: "Invalid Max Score", message: "Max score must be an integer!", preferredStyle: .alert)
                        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                        self.present(alert, animated: true)
