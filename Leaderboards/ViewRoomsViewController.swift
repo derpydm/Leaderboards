@@ -33,9 +33,6 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         setUpTableView()
         setUpGroups(newGroups: room.groups)
         setUpTitleLabel()
-        NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
-        
-        
         // Get room updates
         roomRef.observe(.childChanged) { (snapshot) in
             if snapshot.exists() {
@@ -43,10 +40,15 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                     return
                 }
                 if let newName = snapshot.value as? String {
+                    self.room.name = newName
+                    self.setUpTitleLabel()
                     self.room = Room(name: newName, code: self.room.code, groups: self.room.groups, maxScore: self.room.maxScore)
-                } else if let newMaxScore = snapshot.value as? Int {
+                }
+                if let newMaxScore = snapshot.value as? Int {
                     self.room = Room(name: self.room.name, code: self.room.code, groups: self.room.groups, maxScore: newMaxScore)
-                } else if let newGroups = snapshot.value as? [[String:Any]] {
+                }
+                
+                if let newGroups = snapshot.value as? [[String:Any]] {
                     var groups: [Group] = []
                     let dictDecoder = DictionaryDecoder()
                     for groupData in newGroups {
@@ -62,19 +64,25 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         
         
     }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
-    }
-    
-    @objc func rotated() {
-        // Re-dequeue cells and layout everything again
-        tableView.reloadData()
-    }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        tableView.reloadData()
+        // Re-dequeue cells and layout everything again
+        var visRows = tableView.indexPathsForVisibleRows!
+        visRows.insert(.init(row: 0, section: 0), at: 0)
+        for indexPath in visRows {
+            // If the cell exists we update it
+            // Else we do nothing as it's probably from updates
+            
+            if let cell = tableView.cellForRow(at: indexPath) as? TeamLeaderboardsTableViewCell {
+                // Update progress indicator
+                let maxWidth = cell.coloredBackground.frame.width
+                cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(room.groups[indexPath.row].score)/CGFloat(room.maxScore)
+                UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
+                    self.view.superview?.layoutIfNeeded()
+                }, completion: nil)
+            }
+        }
     }
     
     func setUpTableView() {
@@ -157,37 +165,35 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         cell.alpha = 0
         return cell
     }
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        // We animate the cells here.
-        // We only want the animation to play at first and when the view updates.
-        if let _ = doNotAnimate[indexPath] {
-            return
-        }
-        
-        
-        doNotAnimate[indexPath] = true
-        let fadeOut = AnimationFactory.makeFadeOut(duration: 0.25, delayFactor: 0.1)
-        let slideIn = AnimationFactory.makeSlideIn(duration: 1, delayFactor: 0.3)
-        let animator = Animator(animation: fadeOut)
-        let animator2 = Animator(animation: slideIn)
-        animator.animate(cell: cell, at: indexPath, in: tableView)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            animator2.animate(cell: cell, at: indexPath, in: tableView)
-        }
-        
-        
-        
-    }
+//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        // We animate the cells here.
+//        // We only want the animation to play at first and when the view updates.
+//        if let _ = doNotAnimate[indexPath] {
+//            return
+//        }
+//
+//
+//        doNotAnimate[indexPath] = true
+//        let fadeOut = AnimationFactory.makeFadeOut(duration: 0.25, delayFactor: 0.1)
+//        let slideIn = AnimationFactory.makeSlideIn(duration: 1, delayFactor: 0.3)
+//        let animator = Animator(animation: fadeOut)
+//        let animator2 = Animator(animation: slideIn)
+//        animator.animate(cell: cell, at: indexPath, in: tableView)
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//            animator2.animate(cell: cell, at: indexPath, in: tableView)
+//        }
+//
+//
+//
+//    }
     
     
     // MARK: - Table view delegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        #warning("clean this up later and combine points/reason alert")
         var sign = 1
-        var alertTitle = "Points to Add"
-        var alertMessage = "How many points would you like to add?"
         let signAlert = UIAlertController(title: "Edit Points", message: "Do you want to add or subtract points?", preferredStyle: .actionSheet)
-        let pointsAlert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
-        let reasonAlert = UIAlertController(title: "Provide reason", message: "Provide a reason for the change.", preferredStyle: .alert)
+        let pointsAlert = UIAlertController(title: "Points to Add", message: "How many points would you like to add?", preferredStyle: .alert)
         
         signAlert.popoverPresentationController?.sourceView = tableView.cellForRow(at: indexPath)
         
@@ -196,21 +202,10 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
             field.placeholder = "Points"
             field.keyboardType = .numberPad
         }
-        pointsAlert.addAction(UIAlertAction(title: "Confirm", style: .default, handler: { (_) in
-            pointsAlert.dismiss(animated: true) {
-                self.present(reasonAlert, animated: true)
-            }
-        }))
-        pointsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        
-
-        
-        var reason = "no reason given"
-        reasonAlert.addTextField { (field) in
-            field.placeholder = "Reason"
+        pointsAlert.addTextField { (field) in
+            field.placeholder = "Reason (blank by default)"
         }
-        reasonAlert.addAction(UIAlertAction(title: "Don't add reason", style: .default, handler: { _ in
-            
+        pointsAlert.addAction(UIAlertAction(title: "Confirm", style: .default, handler: { (_) in
             let pointsField = pointsAlert.textFields![0]
             guard let change = Int(pointsField.text!) else {
                 if pointsField.text!.count > 0 {
@@ -227,49 +222,19 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                 return
             }
             
-            // Firstly, we log this change
-            self.roomRef.child("log").observeSingleEvent(of: .value) { (snapshot) in
-                if snapshot.exists() {
-                    var log = snapshot.value as! [[String:String]]
-                    let formatter = DateFormatter()
-                    formatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
-                    let date = formatter.string(from: Date())
-                    let newLog = ["change":"\(change)","date":date,"group":self.room.groups[indexPath.row].name,"reason":reason]
-                    log.append(newLog)
-                    self.roomRef.child("log").setValue(log)
-                    
-                }
-            }
-            
-            // Then we update the score
-            self.room.groups[indexPath.row].score += (sign * change)
-            let dictEncoder = DictionaryEncoder()
-            
-            var newGroups: [[String:Any]] = []
-            for group in self.room.groups {
-                newGroups.append(try! dictEncoder.encode(group))
-            }
-            self.roomRef.child("groups").setValue(newGroups)
-        }))
-        
-        reasonAlert.addAction(UIAlertAction(title: "Confirm", style: .default, handler: { (_) in
-            let textField = reasonAlert.textFields![0]
-            reason = textField.text ?? ""
-            
-            let pointsField = pointsAlert.textFields![0]
-            guard let change = Int(pointsField.text!) else {
-                if pointsField.text!.count > 0 {
-                    let alert = UIAlertController(title: "Error", message: "You didn't enter a number!", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-                    self.present(alert, animated: true, completion: nil)
-                }
-                return
-            }
-            guard change > 0 else {
-                let alert = UIAlertController(title: "Error", message: "The number must be positive!", preferredStyle: .alert)
+            let finalScore = self.room.groups[indexPath.row].score + (sign * change)
+            guard finalScore >= 0 && finalScore <= self.room.maxScore else {
+                let alert = UIAlertController(title: "Error", message: "You're exceeding or going below the score limit!", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
                 self.present(alert, animated: true, completion: nil)
                 return
+            }
+            
+            var reason = "no reason given"
+            
+            let reasonField = pointsAlert.textFields![1]
+            if reasonField.text != "" {
+                reason = reasonField.text!
             }
 
             
@@ -291,7 +256,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
             }
             
             // Then we update the score
-            let newScore = self.room.groups[indexPath.row].score += (sign * change)
+            self.room.groups[indexPath.row].score += (sign * change)
             
             let dictEncoder = DictionaryEncoder()
             
@@ -301,15 +266,15 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
             }
             self.roomRef.child("groups").setValue(newGroups)
         }))
+        pointsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
-        signAlert.addAction(UIAlertAction(title: "Add Points", style: .default
-            , handler: { (_) in
+        signAlert.addAction(UIAlertAction(title: "Add Points", style: .default, handler: { (_) in
                 self.present(pointsAlert, animated: true)
         }))
         signAlert.addAction(UIAlertAction(title: "Subtract Points", style: .default, handler: { (_) in
             sign = -1
-            alertTitle = "Points to Subtract"
-            alertMessage = "How many points would you like to subtract?"
+            pointsAlert.title = "Points to Subtract"
+            pointsAlert.message = "How many points would you like to subtract?"
             self.present(pointsAlert, animated: true)
         }))
         signAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))

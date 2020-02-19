@@ -8,14 +8,14 @@
 
 import UIKit
 import FirebaseDatabase
-
+import DictionaryCoding
 // This class is an edited bersion of NewRoomTableViewController
 // It grabs data from the room it is given
 class EditRoomTableViewController: UITableViewController {
     var ref: DatabaseReference!
+    var roomRef: DatabaseReference!
     var room: Room!
-    var groups: [Group]!
-    var groupText: String!
+    var groupText: String = ""
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var codeLabel: UILabel!
     @IBOutlet weak var maxScoreTextField: UITextField!
@@ -24,14 +24,13 @@ class EditRoomTableViewController: UITableViewController {
         super.viewDidLoad()
         tableView.allowsSelection = true
         ref = Database.database().reference()
-        
+        roomRef = ref.child("rooms").child(room.code)
         codeLabel.text = room.code
         nameTextField.text = room.name
         maxScoreTextField.text = String(room.maxScore)
         
-        var groupText = ""
-        for (index,group) in groups.enumerated() {
-            if index == groups.count - 1 {
+        for (index,group) in room.groups.enumerated() {
+            if index == room.groups.count - 1 {
                 groupText += "\(group.name)"
             } else {
                 groupText += "\(group.name), "
@@ -43,6 +42,18 @@ class EditRoomTableViewController: UITableViewController {
     
     func reloadGroupText() {
         groupNamesTextField.attributedText = coloredCommas(with: groupText)
+        // Grab the new group names
+        // For each group name, check if it has a value not equal to zero - in which case, set the value
+        var updatedGroups: [Group] = []
+        let newGroups = groupText.components(separatedBy: ", ")
+        for name in newGroups {
+            if let index = room.groups.firstIndex(where: { (grp) -> Bool in grp.name == name }) {
+                updatedGroups.append(room.groups[index])
+            } else {
+                updatedGroups.append(Group(name, 0))
+            }
+        }
+        self.room.groups = updatedGroups
     }
     
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
@@ -61,7 +72,6 @@ class EditRoomTableViewController: UITableViewController {
     
     @IBAction func backToEdit(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
         reloadGroupText()
-        
     }
     @IBAction func updateNewRoom(_ sender: Any) {
         
@@ -98,15 +108,20 @@ class EditRoomTableViewController: UITableViewController {
         // Grab the new group names
         // For each group name, check if it has a value not equal to zero - in which case, set the value
         var updatedGroups: [Group] = []
-        let newGroups = groupNames.components(separatedBy: ", ")
+        let newGroups = groupText.components(separatedBy: ", ")
         for name in newGroups {
-            if let index = groups.firstIndex(where: { (grp) -> Bool in grp.name == name }) {
-                updatedGroups.append(groups[index])
+            if let index = room.groups.firstIndex(where: { (grp) -> Bool in grp.name == name }) {
+                updatedGroups.append(room.groups[index])
             } else {
                 updatedGroups.append(Group(name, 0))
             }
         }
-        
+        var encodedGroups: [[String:Any]] = []
+        let dictEncoder = DictionaryEncoder()
+        for group in updatedGroups {
+            encodedGroups.append(try! dictEncoder.encode(group))
+        }
+        roomRef.setValue(["name": name, "code": code, "maxScore": maxScore, "groups": encodedGroups])
         // Go back to the room
         performSegue(withIdentifier: "backToRoom", sender: self)
     }
@@ -135,9 +150,9 @@ class EditRoomTableViewController: UITableViewController {
      // Pass the selected object to the new view controller.
         if segue.identifier == "editRoomEditGroups" {
             let nav = segue.destination as! UINavigationController
-                 let dest = nav.viewControllers[0] as! EditGroupsTableViewController
+            let dest = nav.viewControllers[0] as! EditGroupsTableViewController
             dest.identifier = "editGroups"
-           
+            dest.groups = room.groups
         }
      
         

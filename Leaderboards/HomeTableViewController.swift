@@ -55,7 +55,6 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
             // Reload data
             self.shouldAnimate = true
             self.collectionView.reloadData()
-            print(self.rooms)
         }
         setUpUserGreetingLabel()
     }
@@ -77,7 +76,6 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
         let indexPath = self.collectionView.indexPathForItem(at: p)
         let actionSheet = UIAlertController(title: "Delete Room", message: "Deleting this room will remove it permanently. Are you sure?", preferredStyle: .actionSheet)
         if let index = indexPath {
-            // do stuff with your cell, for example print the indexPath
             actionSheet.popoverPresentationController?.sourceView = collectionView.cellForItem(at: index)
             haptics.impactOccurred()
             actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -89,8 +87,6 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
                 self.collectionView.reloadData()
             }))
             self.present(actionSheet, animated: true)
-        } else {
-            print("Could not find index path")
         }
     }
     @IBAction func unwindToHome(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
@@ -126,7 +122,6 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
             // Reload data
             self.shouldAnimate = true
             self.collectionView.reloadData()
-            print(self.rooms)
         }
     }
     
@@ -201,7 +196,6 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
                 }
                 let room = Room(name: name, code: code, groups: groups, maxScore: maxScore)
                 self.sentRoom = room
-                print(room)
                 self.performSegue(withIdentifier: "showRoom", sender: nil)
                 
             }
