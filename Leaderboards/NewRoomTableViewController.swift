@@ -10,6 +10,7 @@ import UIKit
 import FirebaseDatabase
 class NewRoomTableViewController: UITableViewController {
     var ref: DatabaseReference!
+    var roomRef: DatabaseReference!
     var groupText: String!
     var groupNames: String!
     @IBOutlet weak var nameTextField: UITextField!
@@ -98,17 +99,15 @@ class NewRoomTableViewController: UITableViewController {
         
         let groupNamesArray = groupNames.components(separatedBy: ", ")
         
-        var groups: [String:Int] = [:]
+        var groups: [[String:Any]] = []
         for name in groupNamesArray {
-            groups.updateValue(0, forKey: name)
+            groups.append(["name": name, "score": 0])
         }
-        
-        // Create room, add it to Firebase
-        let newRoom = Room(name: name, code: code, groups: groups, maxScore: intMaxScore)
-        self.ref.child("rooms").child(code).child("name").setValue(newRoom.name)
-        self.ref.child("rooms").child(code).child("code").setValue(newRoom.code)
-        self.ref.child("rooms").child(code).child("groups").setValue(newRoom.groups)
-        self.ref.child("rooms").child(code).child("maxScore").setValue(newRoom.maxScore)
+        self.roomRef = self.ref.child("rooms").child(code)
+        self.roomRef.child("name").setValue(name)
+        self.roomRef.child("code").setValue(code)
+        self.roomRef.child("groups").setValue(groups)
+        self.roomRef.child("maxScore").setValue(maxScore)
         
         
         performSegue(withIdentifier: "unwindFromNewToHome", sender: self)

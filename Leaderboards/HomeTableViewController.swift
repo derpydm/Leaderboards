@@ -8,13 +8,12 @@
 
 import UIKit
 import FirebaseDatabase
+import DictionaryCoding
 class HomeTableViewController: UITableViewController, UICollectionViewDataSource, UICollectionViewDelegate, UIGestureRecognizerDelegate {
     
     @IBOutlet weak var collectionView: UICollectionView!
     var shouldAnimate = true
-    var roomNames: [String]! = []
-    var roomCodes: [String]! = []
-    var roomGroups: [[String:Int]]! = []
+    var rooms: [Room] = []
     @IBOutlet weak var userGreetingsLabel: UILabel!
     var ref: DatabaseReference!
     var sentRoom: Room!
@@ -28,29 +27,27 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
         
         ref.child("rooms").observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
-                let rooms = snapshot.value as! NSDictionary
-                let keys = rooms.allKeys as! [String]
+                self.shouldAnimate = true
+                let value = snapshot.value as! NSDictionary
+                let keys = value.allKeys as! [String]
                 
                 // Clear all rooms as we are reinitialising them
                 
-                self.roomCodes.removeAll()
-                self.roomNames.removeAll()
-                self.roomGroups.removeAll()
-                
+                self.rooms.removeAll()
                 for roomCode in keys {
-                    
                     // Force downcast for all of these as we already know the room exists
-                    let room = rooms[roomCode]! as! NSDictionary
+                    let room = value[roomCode]! as! NSDictionary
                     let code = room["code"] as! String
-                    let groups = room["groups"] as! [String:Int]
+                    let groups = room["groups"] as! [[String:Any]]
                     let name = room["name"] as! String
-                    print(code)
-                    print(groups)
-                    print(name)
-                    self.roomNames.append(name)
-                    self.roomCodes.append(code)
-                    self.roomGroups.append(groups)
-                    
+                    let maxScore = Int(room["maxScore"] as! String)!
+                    var groupsArray: [Group] = []
+                    let dictDecoder = DictionaryDecoder()
+                    for group in groups {
+                        groupsArray.append(try! dictDecoder.decode(Group.self, from: group))
+                    }
+                    let newRoom = Room(name: name, code: code, groups: groupsArray, maxScore: maxScore)
+                    self.rooms.append(newRoom)
                 }
                 
             }
@@ -58,7 +55,6 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
             // Reload data
             self.shouldAnimate = true
             self.collectionView.reloadData()
-            
         }
         setUpUserGreetingLabel()
     }
@@ -80,21 +76,17 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
         let indexPath = self.collectionView.indexPathForItem(at: p)
         let actionSheet = UIAlertController(title: "Delete Room", message: "Deleting this room will remove it permanently. Are you sure?", preferredStyle: .actionSheet)
         if let index = indexPath {
-            // do stuff with your cell, for example print the indexPath
             actionSheet.popoverPresentationController?.sourceView = collectionView.cellForItem(at: index)
             haptics.impactOccurred()
+            actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             actionSheet.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { (action) in
                 let row = index.row
-                self.ref.child("rooms").child(self.roomCodes[row]).removeValue()
-                self.roomNames.remove(at: row)
-                self.roomGroups.remove(at: row)
-                self.roomCodes.remove(at: row)
+                self.ref.child("rooms").child(self.rooms[row].code).removeValue()
+                self.rooms.remove(at: row)
                 self.shouldAnimate = true
                 self.collectionView.reloadData()
             }))
             self.present(actionSheet, animated: true)
-        } else {
-            print("Could not find index path")
         }
     }
     @IBAction func unwindToHome(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
@@ -103,29 +95,26 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
         ref.child("rooms").observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
                 self.shouldAnimate = true
-                let rooms = snapshot.value as! NSDictionary
-                let keys = rooms.allKeys as! [String]
+                let value = snapshot.value as! NSDictionary
+                let keys = value.allKeys as! [String]
                 
                 // Clear all rooms as we are reinitialising them
                 
-                self.roomCodes.removeAll()
-                self.roomNames.removeAll()
-                self.roomGroups.removeAll()
-                
+                self.rooms.removeAll()
                 for roomCode in keys {
-                    
                     // Force downcast for all of these as we already know the room exists
-                    let room = rooms[roomCode]! as! NSDictionary
+                    let room = value[roomCode]! as! NSDictionary
                     let code = room["code"] as! String
-                    let groups = room["groups"] as! [String:Int]
+                    let groups = room["groups"] as! [[String:Any]]
                     let name = room["name"] as! String
-                    print(code)
-                    print(groups)
-                    print(name)
-                    self.roomNames.append(name)
-                    self.roomCodes.append(code)
-                    self.roomGroups.append(groups)
-                    
+                    let maxScore = Int(room["maxScore"] as! String)!
+                    var groupsArray: [Group] = []
+                    let dictDecoder = DictionaryDecoder()
+                    for group in groups {
+                        groupsArray.append(try! dictDecoder.decode(Group.self, from: group))
+                    }
+                    let newRoom = Room(name: name, code: code, groups: groupsArray, maxScore: maxScore)
+                    self.rooms.append(newRoom)
                 }
                 
             }
@@ -133,7 +122,6 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
             // Reload data
             self.shouldAnimate = true
             self.collectionView.reloadData()
-            
         }
     }
     
@@ -161,7 +149,7 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
     
     // MARK: - CollectionView Datasource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return roomNames.count
+        return rooms.count
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -172,15 +160,16 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
             let animator = CollectionViewAnimator(animation: animation)
             animator.animate(cell: cell, at: indexPath, in: collectionView)
         }
-        if indexPath.row == roomNames.endIndex - 1 {
+        if indexPath.row == rooms.endIndex - 1 {
             shouldAnimate = false
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "myroom", for: indexPath) as! MyRoomsCollectionViewCell
-        cell.titleLabel.text = roomNames[indexPath.row]
-        cell.roomCodeLabel.text = roomCodes[indexPath.row]
+        let room = rooms[indexPath.row]
+        cell.titleLabel.text = room.name
+        cell.roomCodeLabel.text = room.code
         cell.layer.cornerRadius = 12
         cell.clipsToBounds = true
         
@@ -190,24 +179,23 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
     // MARK: - CollectionView Delegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        // Grab the new room from Firebase again in case there were changes from loading till now
+        // Grab the new room from Firebase again in case the room was deleted from loading till now
         
-        ref.child("rooms").child(roomCodes[indexPath.row]).observeSingleEvent(of: .value) { (snapshot) in
+        sentRoom = rooms[indexPath.row]
+        ref.child("rooms").child(sentRoom.code).observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.exists() {
-                
-                // grab data
-                
                 let value = snapshot.value as! NSDictionary
-                let code = value["code"] as! String
                 let name = value["name"] as! String
-                let groups = value["groups"] as! [String:Int]
-                let maxScore = value["maxScore"] as! Int
-                // make a new room
-                
-                self.sentRoom = Room(name: name, code: code, groups: groups, maxScore: maxScore)
-                
-                // segue to the room itself
-                
+                let code = value["code"] as! String
+                let maxScore = Int(value["maxScore"] as! String)!
+                let rawGroups = value["groups"] as! [[String:Any]]
+                let dictDecoder = DictionaryDecoder()
+                var groups: [Group] = []
+                for group in rawGroups {
+                    groups.append(try! dictDecoder.decode(Group.self, from: group))
+                }
+                let room = Room(name: name, code: code, groups: groups, maxScore: maxScore)
+                self.sentRoom = room
                 self.performSegue(withIdentifier: "showRoom", sender: nil)
                 
             }
@@ -220,7 +208,6 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showRoom" {
-            // make a new instance of
             let nav = segue.destination as! UINavigationController
             let dest = nav.viewControllers[0] as! ViewRoomsViewController
             dest.room = sentRoom

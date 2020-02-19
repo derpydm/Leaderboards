@@ -8,9 +8,10 @@
 
 import Foundation
 import UIKit
+import DeepDiff
 
 class Room: Codable {
-    init(name: String, code: String, groups: [String:Int], maxScore: Int) {
+    init(name: String, code: String, groups: [Group], maxScore: Int) {
         self.name = name
         self.code = code
         self.groups = groups
@@ -18,12 +19,31 @@ class Room: Codable {
     }
     var name: String
     var code: String
-    var groups: [String:Int]
+    var groups: [Group]
     var maxScore: Int = 1000
-    func encode() {
-        
-    }
 }
+
+struct Group: Codable, DiffAware {
+    var diffId: DiffId {
+        self.name
+    }
+    		
+    static func compareContent(_ a: Group, _ b: Group) -> Bool {
+        return a.score == b.score
+    }
+    
+    typealias DiffId = String
+    
+    
+    init(_ name: String, _ score: Int) {
+        self.name = name
+        self.score = score
+    }
+    var name: String
+    var score: Int
+}
+
+
 
 func coloredCommas(with string: String) -> NSAttributedString {
     let mutableString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.font : UIFont.boldSystemFont(ofSize: 18), NSAttributedString.Key.foregroundColor : #colorLiteral(red: 0.184713006, green: 0.2980033159, blue: 0.5609270334, alpha: 1)])

@@ -9,7 +9,6 @@
 import UIKit
 
 class MyRoomsCollectionViewCell: UICollectionViewCell {
-    
     @IBOutlet weak var roomCodeLabel: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
 }

@@ -25,11 +25,22 @@ enum AnimationFactory {
             })
         }
     }
+    static func makeFadeOut(duration: TimeInterval, delayFactor: Double) -> Animation {
+        return { cell, indexPath, _ in
+            cell.alpha = 1
+
+            UIView.animate(
+                withDuration: duration,
+                delay: delayFactor * Double(indexPath.row),
+                animations: {
+                    cell.alpha = 0
+            })
+        }
+    }
     
     static func makeCollFade(duration: TimeInterval, delayFactor: Double) -> CollectionViewAnimation {
         return { cell, indexPath, _ in
             cell.alpha = 0
-
             UIView.animate(
                 withDuration: duration,
                 delay: delayFactor * Double(indexPath.row),
@@ -58,16 +69,19 @@ enum AnimationFactory {
     static func makeSlideIn(duration: TimeInterval, delayFactor: Double) -> Animation {
         return { cell, indexPath, tableView in
             cell.transform = CGAffineTransform(translationX: tableView.bounds.width, y: 0)
-
+            cell.alpha = 1
             UIView.animate(
                 withDuration: duration,
                 delay: delayFactor * Double(indexPath.row),
+                usingSpringWithDamping: 0.85,
+                initialSpringVelocity: 0.5,
                 options: [.curveEaseInOut],
                 animations: {
                     cell.transform = CGAffineTransform(translationX: 0, y: 0)
             })
         }
     }
+    
 
     static func makeMoveUpWithFade(rowHeight: CGFloat, duration: TimeInterval, delayFactor: Double) -> Animation {
         return { cell, indexPath, tableView in

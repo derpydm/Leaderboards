@@ -7,4 +7,6 @@ target 'Leaderboards' do
 
   # Pods for Leaderboards
   pod 'Firebase/Database'
+  pod 'DeepDiff'
+  pod 'DictionaryCoding'
 end

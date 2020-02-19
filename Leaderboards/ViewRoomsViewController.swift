@@ -8,6 +8,8 @@
 
 import UIKit
 import FirebaseDatabase
+import DictionaryCoding
+import DeepDiff
 class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var subTitleTextLabel: UILabel!
@@ -16,8 +18,6 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     // Recieve room from another viewcontroller
     var room: Room!
     var shouldAnimate = false
-    var groupScores: [Int]! = []
-    var groupNames: [String]! = []
     var ref: DatabaseReference!
     var roomRef: DatabaseReference!
     var doNotAnimate: [IndexPath:Bool] = [:]
@@ -25,69 +25,64 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.ref = Database.database().reference()
+        self.roomRef = ref.child("rooms").child(room.code)
+        
         
         // Initialise UI
         setUpTableView()
-        setUpGroups()
+        setUpGroups(newGroups: room.groups)
         setUpTitleLabel()
-        NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
-        tableView.reloadData()
-        
-        // Set up Firebase listener
-        
-        self.ref = Database.database().reference()
-        self.roomRef = ref.child("rooms").child(room.code)
+        // Get room updates
         roomRef.observe(.childChanged) { (snapshot) in
-            print(snapshot)
             if snapshot.exists() {
-                // Inform tableView that it is ok to animate now
-                self.shouldAnimate = true
-                // Check which value is changed
-                let value = snapshot.value!
-                // The code doesn't ever change for a single room so we don't touch it
-                let code = self.room.code
-                let name = value as? String ?? self.room.name
-                let groups = value as? [String:Int] ?? self.room.groups
-                let maxScore = value as? Int ?? self.room.maxScore
-                // Update the room and reload everything
-                let newRoom = Room(name: name, code: code, groups: groups, maxScore: maxScore)
-                print(groups)
-                self.room = newRoom
-                self.setUpGroups()
-                self.setUpTitleLabel()
-                self.doNotAnimate.removeAll()
+                if (snapshot.value as? [[String:String]]) != nil {
+                    return
+                }
+                if let newName = snapshot.value as? String {
+                    self.room.name = newName
+                    self.setUpTitleLabel()
+                    self.room = Room(name: newName, code: self.room.code, groups: self.room.groups, maxScore: self.room.maxScore)
+                }
+                if let newMaxScore = snapshot.value as? Int {
+                    self.room = Room(name: self.room.name, code: self.room.code, groups: self.room.groups, maxScore: newMaxScore)
+                }
+                
+                if let newGroups = snapshot.value as? [[String:Any]] {
+                    var groups: [Group] = []
+                    let dictDecoder = DictionaryDecoder()
+                    for groupData in newGroups {
+                        let group = try! dictDecoder.decode(Group.self, from: groupData)
+                        groups.append(group)
+                    }
+                    self.setUpGroups(newGroups: groups)
+                    return
+                }
                 self.tableView.reloadData()
             }
         }
         
-            
         
-        // Debug
-        print("Room \(room.code) with name \(room.name) and groups \(groupNames)")
-        
-    }
-    deinit {
-       NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
-    }
-    
-    @objc func rotated() {
-        // Re-dequeue cells and layout everything again
-        tableView.reloadData()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        tableView.reloadData()
-    }
-    
-    // Unused function
-    func getTableViewCellIndexPaths(sectionIndex: Int = 0) {
-        var reloadPaths = [IndexPath]()
-        (0..<tableView.numberOfRows(inSection: sectionIndex)).indices.forEach { rowIndex in
-            let indexPath = IndexPath(row: rowIndex, section: sectionIndex)
-            reloadPaths.append(indexPath)
+        // Re-dequeue cells and layout everything again
+        var visRows = tableView.indexPathsForVisibleRows!
+        visRows.insert(.init(row: 0, section: 0), at: 0)
+        for indexPath in visRows {
+            // If the cell exists we update it
+            // Else we do nothing as it's probably from updates
+            
+            if let cell = tableView.cellForRow(at: indexPath) as? TeamLeaderboardsTableViewCell {
+                // Update progress indicator
+                let maxWidth = cell.coloredBackground.frame.width
+                cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(room.groups[indexPath.row].score)/CGFloat(room.maxScore)
+                UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
+                    self.view.superview?.layoutIfNeeded()
+                }, completion: nil)
+            }
         }
-        tableView.reloadRows(at: reloadPaths, with: .automatic)
     }
     
     func setUpTableView() {
@@ -106,19 +101,19 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     
     @IBAction func unwindToRoom(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
     }
-    func setUpGroups() {
+    
+    func setUpGroups(newGroups: [Group]) {
         // Sort the values and match them with the names
-        
-        let groups = room.groups
-        let sortedValues = groups.sorted { $0.1 > $1.1 }
-        groupScores.removeAll()
-        groupNames.removeAll()
-        for tup in sortedValues {
-            groupScores.append(tup.value)
-            groupNames.append(tup.key)
+        let oldGroups = room.groups
+        let sortedGroups = newGroups.sorted { (a, b) -> Bool in
+            a.score > b.score
         }
-        return
-        
+        let changes = diff(old: oldGroups, new: sortedGroups)
+        tableView.reload(changes: changes, section: 0, insertionAnimation: .automatic, deletionAnimation: .automatic, replacementAnimation: .automatic, updateData: {
+            room.groups = sortedGroups
+        }) { _ in
+            self.tableView.reloadData()
+        }
     }
     
     @IBAction func dismissButtonPressed(_ sender: Any) {
@@ -134,20 +129,17 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         if segue.identifier == "editRoom" {
             let dest = segue.destination as! EditRoomTableViewController
             dest.room = room
-            dest.groupNames = groupNames
-            dest.scores = groupScores
+            
         } else if segue.identifier == "unwindToHomeFromRoom" {
             let dest = segue.destination as! HomeTableViewController
-            dest.roomGroups.removeAll()
-            dest.roomNames.removeAll()
-            dest.roomCodes.removeAll()
+            dest.rooms.removeAll()
             dest.collectionView.reloadData()
         }
     }
-    
+    	
     // MARK: - Table view data source
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return groupScores.count
+        return room.groups.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -157,140 +149,136 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         // Set up labels
         cell.groupRankLabel.text = String(indexPath.row + 1)
         
-        cell.scoreLabel.text = String(groupScores[indexPath.row])
+        cell.scoreLabel.text = String(room.groups[indexPath.row].score)
         
         // Update progress indicator
         let maxWidth = cell.coloredBackground.frame.width
-        cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(groupScores[indexPath.row])/CGFloat(room.maxScore)
-        
+        let greenComponent = #colorLiteral(red: 0.4666666667, green: 0.8666666667, blue: 0.4666666667, alpha: 1).withAlphaComponent(CGFloat(room.groups[indexPath.row].score) / CGFloat(room.maxScore))
+        let redComponent = #colorLiteral(red: 1, green: 0.4117647059, blue: 0.3803921569, alpha: 1).withAlphaComponent((CGFloat(room.maxScore - room.groups[indexPath.row].score) / CGFloat(room.maxScore)))
+        cell.progressIndicator.backgroundColor = greenComponent + redComponent
+        cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(room.groups[indexPath.row].score)/CGFloat(room.maxScore)
+        UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
+            self.view.superview?.layoutIfNeeded()
+        }, completion: nil)
         // Set up group name
-        cell.groupNameLabel.text = groupNames[indexPath.row]
-        
+        cell.groupNameLabel.text = room.groups[indexPath.row].name
+        cell.alpha = 0
         return cell
     }
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        // We animate the cells here.
-        // We only want the animation to play at first and when the view updates.
-        if let _ = doNotAnimate[indexPath] {
-            return
-        }
-        
-        
-        doNotAnimate[indexPath] = true
-        let animation = AnimationFactory.makeMoveUpWithFade(rowHeight: cell.frame.height, duration: 1.0, delayFactor: 0.2)
-        let animator = Animator(animation: animation)
-        animator.animate(cell: cell, at: indexPath, in: tableView)
-        
-        
-        
-    }
+//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        // We animate the cells here.
+//        // We only want the animation to play at first and when the view updates.
+//        if let _ = doNotAnimate[indexPath] {
+//            return
+//        }
+//
+//
+//        doNotAnimate[indexPath] = true
+//        let fadeOut = AnimationFactory.makeFadeOut(duration: 0.25, delayFactor: 0.1)
+//        let slideIn = AnimationFactory.makeSlideIn(duration: 1, delayFactor: 0.3)
+//        let animator = Animator(animation: fadeOut)
+//        let animator2 = Animator(animation: slideIn)
+//        animator.animate(cell: cell, at: indexPath, in: tableView)
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//            animator2.animate(cell: cell, at: indexPath, in: tableView)
+//        }
+//
+//
+//
+//    }
+    
+    
     // MARK: - Table view delegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        #warning("clean this up later and combine points/reason alert")
         var sign = 1
-        let signAlert = UIAlertController(title: "Changing Points", message: "Are you adding or subtracting points?", preferredStyle: .actionSheet)
+        let signAlert = UIAlertController(title: "Edit Points", message: "Do you want to add or subtract points?", preferredStyle: .actionSheet)
+        let pointsAlert = UIAlertController(title: "Points to Add", message: "How many points would you like to add?", preferredStyle: .alert)
+        
         signAlert.popoverPresentationController?.sourceView = tableView.cellForRow(at: indexPath)
-        // We establish the points alert now so we can display it after the signAlert
-        // Title and message will be added later
-        let pointsAlert = UIAlertController(title: "", message: "", preferredStyle: .alert)
-        pointsAlert.addTextField { (textField) in
-            textField.placeholder = "Points"
-            textField.keyboardType = .numberPad
+        
+        
+        pointsAlert.addTextField { (field) in
+            field.placeholder = "Points"
+            field.keyboardType = .numberPad
         }
-        pointsAlert.addAction(UIAlertAction(title: "Update Points", style: .default, handler: { (action) in
-            pointsAlert.dismiss(animated: true) {
-                
-                let textField = pointsAlert.textFields![0]
-                let newScore = textField.text ?? "0"
-                
-                
-                if var newIntScore = Int(newScore) {
-                    // Apply sign then add the original score
-                    let change = newIntScore
-                    if newIntScore < 0 {
-                        let errAlert = UIAlertController(title: "Error", message: "You entered in a negative value! Enter in a value above 0.", preferredStyle: .alert)
-                        errAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                        self.present(errAlert, animated: true)
-                    }
-                    newIntScore = newIntScore * sign
-                    newIntScore += self.groupScores[indexPath.row]
-                    // Check if it exceeds the max score points
-                    if newIntScore > self.room.maxScore {
-                        
-                        let errAlert = UIAlertController(title: "Error", message: "The value is too large! Scores must be below \(self.room.maxScore).", preferredStyle: .alert)
-                        errAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                        self.present(errAlert, animated: true)
-                    } else {
-                        // Save the reason in the log
-                        
-                        var reason = ""
-                        let reasonAlert = UIAlertController(title: "Reason for Update", message: "Provide a reason for this update", preferredStyle: .alert)
-                        reasonAlert.addTextField { (textField) in
-                            textField.placeholder = "Reason"
-                        }
-                        reasonAlert.addAction(UIAlertAction(title: "Update", style: .default, handler: { _ in
-                            let textField = reasonAlert.textFields![0]
-                            reason = textField.text ?? "no reason provided"
-                            let formatter = DateFormatter()
-                            formatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
-                            let date = formatter.string(from: Date())
-                            let groupName = self.groupNames[indexPath.row]
-                            // Get the log and update it - we only need to display in another view controller so we don't have to update values in this VC
-                            let newLog = ["change": String(change), "date": date, "reason": reason, "group": groupName]
-                            self.roomRef.child("log").observeSingleEvent(of: .value) { (snapshot) in
-                                if snapshot.exists() {
-                                    let value = snapshot.value as? NSArray
-                                    self.roomRef.child("log").child(String(value!.count)).setValue(newLog)
-                                } else {
-                                    self.roomRef.child("log").child("0").setValue(newLog)
-                                }
-                            }
-                            // Update score and then save it in Firebase
-                            #warning("Implement a LCS (longest common subsequence) algo and then use it instead")
-                            self.groupScores[indexPath.row] = newIntScore
-                            let newDict = Dictionary(uniqueKeysWithValues: zip(self.groupNames, self.groupScores))
-                            self.roomRef.child("groups").setValue(newDict)
-
-                        }))
-                        self.present(reasonAlert, animated: true)
-                    
-                        
-                    }
-                    
-                } else {
-                    let errAlert = UIAlertController(title: "Error", message: "The value must be an integer!", preferredStyle: .alert)
-                    errAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                    self.present(errAlert, animated: true)
+        pointsAlert.addTextField { (field) in
+            field.placeholder = "Reason (blank by default)"
+        }
+        pointsAlert.addAction(UIAlertAction(title: "Confirm", style: .default, handler: { (_) in
+            let pointsField = pointsAlert.textFields![0]
+            guard let change = Int(pointsField.text!) else {
+                if pointsField.text!.count > 0 {
+                    let alert = UIAlertController(title: "Error", message: "You didn't enter a number!", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
                 }
-                
-                
+                return
             }
+            guard change > 0 else {
+                let alert = UIAlertController(title: "Error", message: "The number must be positive!", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+                return
+            }
+            
+            let finalScore = self.room.groups[indexPath.row].score + (sign * change)
+            guard finalScore >= 0 && finalScore <= self.room.maxScore else {
+                let alert = UIAlertController(title: "Error", message: "You're exceeding or going below the score limit!", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+                return
+            }
+            
+            var reason = "no reason given"
+            
+            let reasonField = pointsAlert.textFields![1]
+            if reasonField.text != "" {
+                reason = reasonField.text!
+            }
+
+            
+            // Firstly, we log this change
+            self.roomRef.child("log").observeSingleEvent(of: .value) { (snapshot) in
+                
+                let formatter = DateFormatter()
+                formatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
+                let date = formatter.string(from: Date())
+                let newLog = ["change":"\(change)","date":date,"group":self.room.groups[indexPath.row].name,"reason":reason]
+                
+                if snapshot.exists() {
+                    var log = snapshot.value as! [[String:String]]
+                    log.append(newLog)
+                    self.roomRef.child("log").setValue(log)
+                } else {
+                    self.roomRef.child("log").setValue([newLog])
+                }
+            }
+            
+            // Then we update the score
+            self.room.groups[indexPath.row].score += (sign * change)
+            
+            let dictEncoder = DictionaryEncoder()
+            
+            var newGroups: [[String:Any]] = []
+            for group in self.room.groups {
+                newGroups.append(try! dictEncoder.encode(group))
+            }
+            self.roomRef.child("groups").setValue(newGroups)
         }))
-        
-        // If they want to add sign doesn't change
-        
-        signAlert.addAction(UIAlertAction(title: "Add", style: .default, handler: { (_) in
-            
-            pointsAlert.title = "Add Points"
-            pointsAlert.message = "How many points do you want to add?"
-            self.present(pointsAlert, animated: true)
-            
-        }))
-        
-        // If they want to subtract the sign changes along with the message
-        
-        signAlert.addAction(UIAlertAction(title: "Subtract", style: .default, handler: { (_) in
-            
-            sign = -1
-            pointsAlert.title = "Subtract Points"
-            pointsAlert.message = "How many points do you want to subtract?"
-            self.present(pointsAlert, animated: true)
-            
-        }))
-        
-        // Add cancel buttons
-        
-        signAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         pointsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        self.present(signAlert,animated: true)
+        
+        signAlert.addAction(UIAlertAction(title: "Add Points", style: .default, handler: { (_) in
+                self.present(pointsAlert, animated: true)
+        }))
+        signAlert.addAction(UIAlertAction(title: "Subtract Points", style: .default, handler: { (_) in
+            sign = -1
+            pointsAlert.title = "Points to Subtract"
+            pointsAlert.message = "How many points would you like to subtract?"
+            self.present(pointsAlert, animated: true)
+        }))
+        signAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(signAlert, animated: true, completion: nil)
     }
 }

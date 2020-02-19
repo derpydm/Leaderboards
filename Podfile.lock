@@ -1,4 +1,6 @@
 PODS:
+  - DeepDiff (2.3.1)
+  - DictionaryCoding (1.0.6)
   - Firebase/CoreOnly (6.14.0):
     - FirebaseCore (= 6.5.0)
   - Firebase/Database (6.14.0):
@@ -36,10 +38,14 @@ PODS:
   - nanopb/encode (0.3.9011)
 
 DEPENDENCIES:
+  - DeepDiff
+  - DictionaryCoding
   - Firebase/Database
 
 SPEC REPOS:
   trunk:
+    - DeepDiff
+    - DictionaryCoding
     - Firebase
     - FirebaseAuthInterop
     - FirebaseCore
@@ -53,6 +59,8 @@ SPEC REPOS:
     - nanopb
 
 SPEC CHECKSUMS:
+  DeepDiff: e5ae6c50d0321568e4508cec5930b9f10bb293fc
+  DictionaryCoding: 0ebf6aa87afe8be803c544b85b8d894907c0e019
   Firebase: 0219bb4782eb1406f1b9b0628a2e625484ce910d
   FirebaseAuthInterop: 0ffa57668be100582bb7643d4fcb7615496c41fc
   FirebaseCore: 632e05cc5e1199d9147122c16d92305eb04c34bd
@@ -65,6 +73,6 @@ SPEC CHECKSUMS:
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
 
-PODFILE CHECKSUM: a5b9992c7205550a1cc4df3515da9595daab55a2
+PODFILE CHECKSUM: 88c6b92c24fac034bcd57a1078eb5e0ad58c9810
 
 COCOAPODS: 1.8.4
