@@ -885,10 +885,18 @@
                     </tableView>
                     <navigationItem key="navigationItem" id="Fsg-Vj-X2q">
                         <barButtonItem key="rightBarButtonItem" style="plain" id="9dK-7r-NeF">
-                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="sJm-dW-3oE">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" hasAttributedTitle="YES" id="sJm-dW-3oE">
                                 <rect key="frame" x="360" y="7" width="34" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Save"/>
+                                <state key="normal">
+                                    <attributedString key="attributedTitle">
+                                        <fragment content="Save">
+                                            <attributes>
+                                                <font key="NSFont" metaFont="system" size="15"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
+                                </state>
                                 <connections>
                                     <action selector="updateNewRoom:" destination="ABX-Mj-jE9" eventType="touchUpInside" id="cyk-4u-PnH"/>
                                 </connections>

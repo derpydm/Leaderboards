@@ -1,5 +1,5 @@
 //
-//  RoomViewController.swift
+//  ViewRoomsViewController.swift
 //  Leaderboards
 //
 //  Created by Sean Wong on 3/11/19.

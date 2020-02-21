@@ -156,7 +156,7 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
         // We animate the cells here.
         // We only want the animation to play at first and when the view updates.
         if shouldAnimate {
-            let animation = AnimationFactory.makeCollFade(duration: 1.0, delayFactor: 0.2)
+            let animation = AnimationFactory.makeFade(duration: 1.0, delayFactor: 0.2)
             let animator = CollectionViewAnimator(animation: animation)
             animator.animate(cell: cell, at: indexPath, in: collectionView)
         }

@@ -29,7 +29,6 @@ class NewRoomTableViewController: UITableViewController {
         dismiss(animated: true, completion: nil)
     }
     func reloadGroupText() {
-        
         groupNamesTextField.attributedText = coloredCommas(with: groupText)
     }
     func generateCode() -> Int {
