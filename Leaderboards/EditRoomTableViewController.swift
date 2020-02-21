@@ -44,16 +44,16 @@ class EditRoomTableViewController: UITableViewController {
         groupNamesTextField.attributedText = coloredCommas(with: groupText)
         // Grab the new group names
         // For each group name, check if it has a value not equal to zero - in which case, set the value
-        var updatedGroups: [Group] = []
-        let newGroups = groupText.components(separatedBy: ", ")
-        for name in newGroups {
-            if let index = room.groups.firstIndex(where: { (grp) -> Bool in grp.name == name }) {
-                updatedGroups.append(room.groups[index])
-            } else {
-                updatedGroups.append(Group(name, 0))
-            }
-        }
-        self.room.groups = updatedGroups
+//        var updatedGroups: [Group] = []
+//        let newGroups = groupText.components(separatedBy: ", ")
+//        for name in newGroups {
+//            if let index = room.groups.firstIndex(where: { (grp) -> Bool in grp.name == name }) {
+//                updatedGroups.append(room.groups[index])
+//            } else {
+//                updatedGroups.append(Group(name, 0))
+//            }
+//        }
+//        self.room.groups = updatedGroups
     }
     
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
@@ -152,7 +152,9 @@ class EditRoomTableViewController: UITableViewController {
             let nav = segue.destination as! UINavigationController
             let dest = nav.viewControllers[0] as! EditGroupsTableViewController
             dest.identifier = "editGroups"
-            dest.groups = room.groups
+            for name in groupText.components(separatedBy: ", ") {
+                dest.splittedGroups.append(name)
+            }
         }
      
         

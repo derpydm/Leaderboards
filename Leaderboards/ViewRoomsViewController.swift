@@ -42,10 +42,9 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                 if let newName = snapshot.value as? String {
                     self.room.name = newName
                     self.setUpTitleLabel()
-                    self.room = Room(name: newName, code: self.room.code, groups: self.room.groups, maxScore: self.room.maxScore)
                 }
                 if let newMaxScore = snapshot.value as? Int {
-                    self.room = Room(name: self.room.name, code: self.room.code, groups: self.room.groups, maxScore: newMaxScore)
+                    self.room.maxScore = newMaxScore
                 }
                 
                 if let newGroups = snapshot.value as? [[String:Any]] {
@@ -56,6 +55,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                         groups.append(group)
                     }
                     self.setUpGroups(newGroups: groups)
+                    self.doNotAnimate.removeAll()
                     return
                 }
                 self.tableView.reloadData()
@@ -157,9 +157,12 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         let redComponent = #colorLiteral(red: 1, green: 0.4117647059, blue: 0.3803921569, alpha: 1).withAlphaComponent((CGFloat(room.maxScore - room.groups[indexPath.row].score) / CGFloat(room.maxScore)))
         cell.progressIndicator.backgroundColor = greenComponent + redComponent
         cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(room.groups[indexPath.row].score)/CGFloat(room.maxScore)
-        UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
-            self.view.superview?.layoutIfNeeded()
-        }, completion: nil)
+        if doNotAnimate[indexPath] == nil {
+            UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
+                self.view.superview?.layoutIfNeeded()
+            }, completion: nil)
+            doNotAnimate[indexPath] = true
+        }
         // Set up group name
         cell.groupNameLabel.text = room.groups[indexPath.row].name
         cell.alpha = 0

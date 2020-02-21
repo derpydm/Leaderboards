@@ -596,12 +596,12 @@
                                                                 </label>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Group Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hmS-og-eR6">
                                                                     <rect key="frame" x="34" y="0.0" width="222.5" height="60"/>
-                                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                                                     <color key="textColor" name="Color Text Primary"/>
                                                                     <nil key="highlightedColor"/>
                                                                 </label>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KCW-dR-OU9">
-                                                                    <rect key="frame" x="248.5" y="0.0" width="93.5" height="60"/>
+                                                                    <rect key="frame" x="256.5" y="0.0" width="85.5" height="60"/>
                                                                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="20"/>
                                                                     <color key="textColor" name="Color Text Secondary"/>
                                                                     <nil key="highlightedColor"/>
@@ -609,7 +609,7 @@
                                                             </subviews>
                                                             <constraints>
                                                                 <constraint firstItem="hmS-og-eR6" firstAttribute="width" secondItem="Ven-VB-VLn" secondAttribute="width" multiplier="0.65" id="KYY-e9-zaw"/>
-                                                                <constraint firstItem="KCW-dR-OU9" firstAttribute="width" secondItem="Ven-VB-VLn" secondAttribute="width" multiplier="0.2" constant="25" id="Xgf-8q-Frc"/>
+                                                                <constraint firstItem="KCW-dR-OU9" firstAttribute="width" secondItem="Ven-VB-VLn" secondAttribute="width" multiplier="0.25" id="Xgf-8q-Frc"/>
                                                                 <constraint firstItem="NUl-XJ-p57" firstAttribute="width" secondItem="Ven-VB-VLn" secondAttribute="width" multiplier="0.1" id="d3g-1Z-BXr"/>
                                                             </constraints>
                                                         </stackView>
@@ -652,11 +652,11 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
                             <constraint firstItem="Dx0-QA-pvB" firstAttribute="top" secondItem="ZvR-zi-81z" secondAttribute="top" constant="5" id="7fr-H1-5Xe"/>
-                            <constraint firstItem="ZvR-zi-81z" firstAttribute="trailing" secondItem="S6Y-5O-fpd" secondAttribute="trailing" id="QFP-g5-xE1"/>
-                            <constraint firstItem="ZvR-zi-81z" firstAttribute="bottom" secondItem="S6Y-5O-fpd" secondAttribute="bottom" id="XLm-Uq-ydS"/>
+                            <constraint firstItem="S6Y-5O-fpd" firstAttribute="bottom" secondItem="ZvR-zi-81z" secondAttribute="bottom" id="ISt-tZ-Ift"/>
+                            <constraint firstItem="S6Y-5O-fpd" firstAttribute="top" secondItem="Dx0-QA-pvB" secondAttribute="bottom" constant="5" id="Rtc-xe-ISO"/>
                             <constraint firstItem="Dx0-QA-pvB" firstAttribute="leading" secondItem="ZvR-zi-81z" secondAttribute="leading" constant="20" id="ics-iY-GUf"/>
-                            <constraint firstItem="S6Y-5O-fpd" firstAttribute="leading" secondItem="ZvR-zi-81z" secondAttribute="leading" id="kCh-dx-iMO"/>
-                            <constraint firstItem="S6Y-5O-fpd" firstAttribute="top" secondItem="Dx0-QA-pvB" secondAttribute="bottom" constant="5" id="ycr-7R-h9C"/>
+                            <constraint firstItem="S6Y-5O-fpd" firstAttribute="leading" secondItem="ZvR-zi-81z" secondAttribute="leading" id="pe9-Bg-y8e"/>
+                            <constraint firstItem="S6Y-5O-fpd" firstAttribute="centerX" secondItem="uTK-UW-rut" secondAttribute="centerX" id="v6G-yr-A7P"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ZvR-zi-81z"/>
                     </view>
