@@ -54,8 +54,8 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                         let group = try! dictDecoder.decode(Group.self, from: groupData)
                         groups.append(group)
                     }
-                    self.setUpGroups(newGroups: groups)
                     self.doNotAnimate.removeAll()
+                    self.setUpGroups(newGroups: groups)
                     return
                 }
                 self.tableView.reloadData()

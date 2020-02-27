@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1AB9F3182407600D0097D70A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1AB9F3172407600D0097D70A /* GoogleService-Info.plist */; };
 		324B9FBC236DB64200899D24 /* HomeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FBB236DB64200899D24 /* HomeTableViewController.swift */; };
 		324B9FBE236DBB8900899D24 /* NewRoomTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FBD236DBB8900899D24 /* NewRoomTableViewController.swift */; };
 		324B9FC0236DDCA000899D24 /* MyRoomsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324B9FBF236DDCA000899D24 /* MyRoomsCollectionViewCell.swift */; };
@@ -31,6 +32,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1AB9F3172407600D0097D70A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		324B9FBB236DB64200899D24 /* HomeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTableViewController.swift; sourceTree = "<group>"; };
 		324B9FBD236DBB8900899D24 /* NewRoomTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewRoomTableViewController.swift; sourceTree = "<group>"; };
 		324B9FBF236DDCA000899D24 /* MyRoomsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyRoomsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 				32959E0A236D8B7300230317 /* SceneDelegate.swift */,
 				324B9FBD236DBB8900899D24 /* NewRoomTableViewController.swift */,
 				32959E0E236D8B7300230317 /* Main.storyboard */,
+				1AB9F3172407600D0097D70A /* GoogleService-Info.plist */,
 				324B9FC7236E971500899D24 /* TeamLeaderboardsTableViewCell.swift */,
 				5176199D23FF8F9000388DA1 /* Structs and Helpers */,
 				324B9FC3236DE66300899D24 /* ViewRoomsViewController.swift */,
@@ -205,6 +208,7 @@
 			files = (
 				32959E15236D8B7600230317 /* LaunchScreen.storyboard in Resources */,
 				51EF073D23FD2AA4004C66F7 /* GoogleService-Info.plist in Resources */,
+				1AB9F3182407600D0097D70A /* GoogleService-Info.plist in Resources */,
 				32959E12236D8B7600230317 /* Assets.xcassets in Resources */,
 				32959E10236D8B7300230317 /* Main.storyboard in Resources */,
 			);

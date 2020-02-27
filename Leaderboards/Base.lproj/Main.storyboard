@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="zTc-dm-qLa">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="zTc-dm-qLa">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -576,7 +576,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Xmw-hf-RlR">
-                                                    <rect key="frame" x="20" y="5" width="374" height="60"/>
+                                                    <rect key="frame" x="16" y="5" width="382" height="60"/>
                                                     <subviews>
                                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aV6-w2-DjM">
                                                             <rect key="frame" x="0.0" y="0.0" width="92" height="60"/>
@@ -586,22 +586,22 @@
                                                             </constraints>
                                                         </view>
                                                         <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="Ven-VB-VLn">
-                                                            <rect key="frame" x="16" y="0.0" width="342" height="60"/>
+                                                            <rect key="frame" x="16" y="0.0" width="350" height="60"/>
                                                             <subviews>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NUl-XJ-p57">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="34" height="60"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="35" height="60"/>
                                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
                                                                     <color key="textColor" name="Color Text Secondary"/>
                                                                     <nil key="highlightedColor"/>
                                                                 </label>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Group Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hmS-og-eR6">
-                                                                    <rect key="frame" x="34" y="0.0" width="222.5" height="60"/>
+                                                                    <rect key="frame" x="35" y="0.0" width="227.5" height="60"/>
                                                                     <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                                                     <color key="textColor" name="Color Text Primary"/>
                                                                     <nil key="highlightedColor"/>
                                                                 </label>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KCW-dR-OU9">
-                                                                    <rect key="frame" x="256.5" y="0.0" width="85.5" height="60"/>
+                                                                    <rect key="frame" x="262.5" y="0.0" width="87.5" height="60"/>
                                                                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="20"/>
                                                                     <color key="textColor" name="Color Text Secondary"/>
                                                                     <nil key="highlightedColor"/>
@@ -627,10 +627,10 @@
                                                 </view>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="Xmw-hf-RlR" firstAttribute="trailing" secondItem="JCY-f1-BS7" secondAttribute="trailingMargin" id="3KC-UM-Cqc"/>
                                                 <constraint firstItem="Xmw-hf-RlR" firstAttribute="top" secondItem="JCY-f1-BS7" secondAttribute="top" constant="5" id="OiV-MT-lTk"/>
-                                                <constraint firstItem="Xmw-hf-RlR" firstAttribute="leading" secondItem="JCY-f1-BS7" secondAttribute="leadingMargin" id="a3d-fc-eRC"/>
+                                                <constraint firstAttribute="trailing" secondItem="Xmw-hf-RlR" secondAttribute="trailing" constant="16" id="quu-v8-Q7X"/>
                                                 <constraint firstAttribute="bottom" secondItem="Xmw-hf-RlR" secondAttribute="bottom" constant="5" id="srr-tb-pJV"/>
+                                                <constraint firstItem="Xmw-hf-RlR" firstAttribute="leading" secondItem="JCY-f1-BS7" secondAttribute="leading" constant="16" id="wPe-lg-Sgx"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
