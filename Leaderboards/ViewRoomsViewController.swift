@@ -78,7 +78,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                 // Update progress indicator
                 let maxWidth = cell.coloredBackground.frame.width
                 cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(room.groups[indexPath.row].score)/CGFloat(room.maxScore)
-                UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
+                UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseIn, animations: {
                     self.view.superview?.layoutIfNeeded()
                 }, completion: nil)
             }
@@ -108,8 +108,14 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         let sortedGroups = newGroups.sorted { (a, b) -> Bool in
             a.score > b.score
         }
-        let changes = diff(old: oldGroups, new: sortedGroups)
-        tableView.reload(changes: changes, section: 0, insertionAnimation: .automatic, deletionAnimation: .automatic, replacementAnimation: .automatic, updateData: {
+        var changes = diff(old: oldGroups, new: sortedGroups)
+        
+        // REMOVE ALL REPLACE CHANGES
+        // I have no idea why this happens but random replaces happen which are terrible for us so we remove them
+        changes.removeAll { (chg) -> Bool in
+            chg.replace != nil
+        }
+        tableView.reload(changes: changes, updateData: {
             room.groups = sortedGroups
         }) { _ in
             self.tableView.reloadData()
@@ -158,7 +164,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         cell.progressIndicator.backgroundColor = greenComponent + redComponent
         cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(room.groups[indexPath.row].score)/CGFloat(room.maxScore)
         if doNotAnimate[indexPath] == nil {
-            UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
+            UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseIn, animations: {
                 self.view.superview?.layoutIfNeeded()
             }, completion: nil)
             doNotAnimate[indexPath] = true

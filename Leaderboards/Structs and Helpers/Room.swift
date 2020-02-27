@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Room: Codable {
+struct Room: Codable {
     init(name: String, code: String, groups: [Group], maxScore: Int) {
         self.name = name
         self.code = code
