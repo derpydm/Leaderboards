@@ -65,26 +65,11 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        // Re-dequeue cells and layout everything again
-        var visRows = tableView.indexPathsForVisibleRows!
-        visRows.insert(.init(row: 0, section: 0), at: 0)
-        for indexPath in visRows {
-            // If the cell exists we update it
-            // Else we do nothing as it's probably from updates
-            
-            if let cell = tableView.cellForRow(at: indexPath) as? TeamLeaderboardsTableViewCell {
-                // Update progress indicator
-                let maxWidth = cell.coloredBackground.frame.width
-                cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(room.groups[indexPath.row].score)/CGFloat(room.maxScore)
-                UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseIn, animations: {
-                    self.view.superview?.layoutIfNeeded()
-                }, completion: nil)
-            }
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        coordinator.animate(alongsideTransition: nil) { (_) in
+            self.tableView.reloadData()
         }
     }
-    
     func setUpTableView() {
         tableView.dataSource = self
         tableView.delegate = self
@@ -160,11 +145,11 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         // Update progress indicator
         let maxWidth = cell.coloredBackground.frame.width
         let greenComponent = #colorLiteral(red: 0.4666666667, green: 0.8666666667, blue: 0.4666666667, alpha: 1).withAlphaComponent(CGFloat(room.groups[indexPath.row].score) / CGFloat(room.maxScore))
-        let redComponent = #colorLiteral(red: 1, green: 0.4117647059, blue: 0.3803921569, alpha: 1).withAlphaComponent((CGFloat(room.maxScore - room.groups[indexPath.row].score) / CGFloat(room.maxScore)))
-        cell.progressIndicator.backgroundColor = greenComponent + redComponent
+        let yellowComponent = #colorLiteral(red: 0.9921568627, green: 0.9921568627, blue: 0.5882352941, alpha: 1).withAlphaComponent((CGFloat(room.maxScore - room.groups[indexPath.row].score) / CGFloat(room.maxScore)))
+        cell.progressIndicator.backgroundColor = greenComponent + yellowComponent
         cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(room.groups[indexPath.row].score)/CGFloat(room.maxScore)
         if doNotAnimate[indexPath] == nil {
-            UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseIn, animations: {
+            UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
                 self.view.superview?.layoutIfNeeded()
             }, completion: nil)
             doNotAnimate[indexPath] = true
@@ -252,7 +237,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                 let formatter = DateFormatter()
                 formatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
                 let date = formatter.string(from: Date())
-                let newLog = ["change":"\(change)","date":date,"group":self.room.groups[indexPath.row].name,"reason":reason]
+                let newLog = ["change":"\(sign * change)","date":date,"group":self.room.groups[indexPath.row].name,"reason":reason]
                 
                 if snapshot.exists() {
                     var log = snapshot.value as! [[String:String]]
