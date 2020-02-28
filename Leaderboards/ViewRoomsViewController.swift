@@ -67,6 +67,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         coordinator.animate(alongsideTransition: nil) { (_) in
+            self.doNotAnimate.removeAll()
             self.tableView.reloadData()
         }
     }
