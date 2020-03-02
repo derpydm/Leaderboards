@@ -17,7 +17,6 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
     @IBOutlet weak var stackView: UIStackView!
     // Recieve room from another viewcontroller
     var room: Room!
-    var shouldAnimate = false
     var ref: DatabaseReference!
     var roomRef: DatabaseReference!
     var doNotAnimate: [IndexPath:Bool] = [:]
@@ -36,17 +35,16 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         // Get room updates
         roomRef.observe(.childChanged) { (snapshot) in
             if snapshot.exists() {
-                if (snapshot.value as? [[String:String]]) != nil {
-                    return
+                if let newMaxScore = snapshot.value as? Int {
+                    self.room.maxScore = newMaxScore
+                    self.doNotAnimate.removeAll()
+                    self.tableView.reloadData()
                 }
                 if let newName = snapshot.value as? String {
                     self.room.name = newName
                     self.setUpTitleLabel()
                 }
-                if let newMaxScore = snapshot.value as? Int {
-                    self.room.maxScore = newMaxScore
-                }
-                
+
                 if let newGroups = snapshot.value as? [[String:Any]] {
                     var groups: [Group] = []
                     let dictDecoder = DictionaryDecoder()
@@ -97,7 +95,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         var changes = diff(old: oldGroups, new: sortedGroups)
         
         // REMOVE ALL REPLACE CHANGES
-        // I have no idea why this happens but random replaces happen which are terrible for us so we remove them
+        // DeepDiff actually states that the
         changes.removeAll { (chg) -> Bool in
             chg.replace != nil
         }
@@ -121,7 +119,6 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         if segue.identifier == "editRoom" {
             let dest = segue.destination as! EditRoomTableViewController
             dest.room = room
-            
         } else if segue.identifier == "unwindToHomeFromRoom" {
             let dest = segue.destination as! HomeTableViewController
             dest.rooms.removeAll()
@@ -145,9 +142,9 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
         
         // Update progress indicator
         let maxWidth = cell.coloredBackground.frame.width
-        let greenComponent = #colorLiteral(red: 0.4666666667, green: 0.8666666667, blue: 0.4666666667, alpha: 1).withAlphaComponent(CGFloat(room.groups[indexPath.row].score) / CGFloat(room.maxScore))
-        let yellowComponent = #colorLiteral(red: 0.9921568627, green: 0.9921568627, blue: 0.5882352941, alpha: 1).withAlphaComponent((CGFloat(room.maxScore - room.groups[indexPath.row].score) / CGFloat(room.maxScore)))
-        cell.progressIndicator.backgroundColor = greenComponent + yellowComponent
+        let highComponent = UIColor(named: "High Color")!.withAlphaComponent(CGFloat(room.groups[indexPath.row].score) / CGFloat(room.maxScore))
+        let lowComponent = UIColor(named: "Low Color")!.withAlphaComponent((CGFloat(room.maxScore - room.groups[indexPath.row].score) / CGFloat(room.maxScore)))
+        cell.progressIndicator.backgroundColor = lowComponent + highComponent
         cell.editProgressIndicatorWidthContraint.constant = maxWidth * CGFloat(room.groups[indexPath.row].score)/CGFloat(room.maxScore)
         if doNotAnimate[indexPath] == nil {
             UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
@@ -155,6 +152,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
             }, completion: nil)
             doNotAnimate[indexPath] = true
         }
+        
         // Set up group name
         cell.groupNameLabel.text = room.groups[indexPath.row].name
         cell.alpha = 0
@@ -196,9 +194,11 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
             field.placeholder = "Points"
             field.keyboardType = .numberPad
         }
+        
         pointsAlert.addTextField { (field) in
             field.placeholder = "Reason (blank by default)"
         }
+        
         pointsAlert.addAction(UIAlertAction(title: "Confirm", style: .default, handler: { (_) in
             let pointsField = pointsAlert.textFields![0]
             guard let change = Int(pointsField.text!) else {
@@ -233,7 +233,7 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
 
             
             // Firstly, we log this change
-            self.roomRef.child("log").observeSingleEvent(of: .value) { (snapshot) in
+            self.ref.child("logs").child(self.room.code).observeSingleEvent(of: .value) { (snapshot) in
                 
                 let formatter = DateFormatter()
                 formatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
@@ -242,10 +242,10 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
                 
                 if snapshot.exists() {
                     var log = snapshot.value as! [[String:String]]
-                    log.append(newLog)
-                    self.roomRef.child("log").setValue(log)
+                    log.insert(newLog, at: 0)
+                    self.ref.child("logs").child(self.room.code).setValue(log)
                 } else {
-                    self.roomRef.child("log").setValue([newLog])
+                    self.ref.child("logs").child(self.room.code).setValue([newLog])
                 }
             }
             
@@ -260,17 +260,20 @@ class ViewRoomsViewController: UIViewController, UITableViewDataSource, UITableV
             }
             self.roomRef.child("groups").setValue(newGroups)
         }))
+        
         pointsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
         signAlert.addAction(UIAlertAction(title: "Add Points", style: .default, handler: { (_) in
                 self.present(pointsAlert, animated: true)
         }))
+        
         signAlert.addAction(UIAlertAction(title: "Subtract Points", style: .default, handler: { (_) in
             sign = -1
             pointsAlert.title = "Points to Subtract"
             pointsAlert.message = "How many points would you like to subtract?"
             self.present(pointsAlert, animated: true)
         }))
+        
         signAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
         self.present(signAlert, animated: true, completion: nil)

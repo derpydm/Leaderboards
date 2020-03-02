@@ -22,40 +22,7 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
         super.viewDidLoad()
         setupLTGR()
         self.ref = Database.database().reference()
-        
-        // Grab rooms
-        
-        ref.child("rooms").observeSingleEvent(of: .value) { (snapshot) in
-            if snapshot.exists() {
-                self.shouldAnimate = true
-                let value = snapshot.value as! NSDictionary
-                let keys = value.allKeys as! [String]
-                
-                // Clear all rooms as we are reinitialising them
-                
-                self.rooms.removeAll()
-                for roomCode in keys {
-                    // Force downcast for all of these as we already know the room exists
-                    let room = value[roomCode]! as! NSDictionary
-                    let code = room["code"] as! String
-                    let groups = room["groups"] as! [[String:Any]]
-                    let name = room["name"] as! String
-                    let maxScore = Int(room["maxScore"] as! String)!
-                    var groupsArray: [Group] = []
-                    let dictDecoder = DictionaryDecoder()
-                    for group in groups {
-                        groupsArray.append(try! dictDecoder.decode(Group.self, from: group))
-                    }
-                    let newRoom = Room(name: name, code: code, groups: groupsArray, maxScore: maxScore)
-                    self.rooms.append(newRoom)
-                }
-                
-            }
-            
-            // Reload data
-            self.shouldAnimate = true
-            self.collectionView.reloadData()
-        }
+        reloadRooms()
         setUpUserGreetingLabel()
     }
     
@@ -89,7 +56,7 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
             self.present(actionSheet, animated: true)
         }
     }
-    @IBAction func unwindToHome(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
+    fileprivate func reloadRooms() {
         // Check for rooms again
         
         ref.child("rooms").observeSingleEvent(of: .value) { (snapshot) in
@@ -107,7 +74,7 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
                     let code = room["code"] as! String
                     let groups = room["groups"] as! [[String:Any]]
                     let name = room["name"] as! String
-                    let maxScore = Int(room["maxScore"] as! String)!
+                    let maxScore = room["maxScore"] as! Int
                     var groupsArray: [Group] = []
                     let dictDecoder = DictionaryDecoder()
                     for group in groups {
@@ -123,6 +90,10 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
             self.shouldAnimate = true
             self.collectionView.reloadData()
         }
+    }
+    
+    @IBAction func unwindToHome(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
+        reloadRooms()
     }
     
     // MARK: - User interface
@@ -187,7 +158,7 @@ class HomeTableViewController: UITableViewController, UICollectionViewDataSource
                 let value = snapshot.value as! NSDictionary
                 let name = value["name"] as! String
                 let code = value["code"] as! String
-                let maxScore = Int(value["maxScore"] as! String)!
+                let maxScore = value["maxScore"] as! Int
                 let rawGroups = value["groups"] as! [[String:Any]]
                 let dictDecoder = DictionaryDecoder()
                 var groups: [Group] = []

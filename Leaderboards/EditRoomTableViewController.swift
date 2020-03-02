@@ -42,18 +42,6 @@ class EditRoomTableViewController: UITableViewController {
     
     func reloadGroupText() {
         groupNamesTextField.attributedText = coloredCommas(with: groupText)
-        // Grab the new group names
-        // For each group name, check if it has a value not equal to zero - in which case, set the value
-//        var updatedGroups: [Group] = []
-//        let newGroups = groupText.components(separatedBy: ", ")
-//        for name in newGroups {
-//            if let index = room.groups.firstIndex(where: { (grp) -> Bool in grp.name == name }) {
-//                updatedGroups.append(room.groups[index])
-//            } else {
-//                updatedGroups.append(Group(name, 0))
-//            }
-//        }
-//        self.room.groups = updatedGroups
     }
     
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
@@ -98,7 +86,7 @@ class EditRoomTableViewController: UITableViewController {
         if maxScore == "" {
             maxScore = "1000"
         }
-        guard Int(maxScore) != nil else {
+        guard let intMaxScore = Int(maxScore) else {
             let alert = UIAlertController(title: "Invalid Max Score", message: "Max score must be an integer!", preferredStyle: .alert)
                        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                        self.present(alert, animated: true)
@@ -111,7 +99,11 @@ class EditRoomTableViewController: UITableViewController {
         let newGroups = groupText.components(separatedBy: ", ")
         for name in newGroups {
             if let index = room.groups.firstIndex(where: { (grp) -> Bool in grp.name == name }) {
-                updatedGroups.append(room.groups[index])
+                var group = room.groups[index]
+                if group.score > intMaxScore {
+                    group.score = intMaxScore
+                }
+                updatedGroups.append(group)
             } else {
                 updatedGroups.append(Group(name, 0))
             }
@@ -121,7 +113,7 @@ class EditRoomTableViewController: UITableViewController {
         for group in updatedGroups {
             encodedGroups.append(try! dictEncoder.encode(group))
         }
-        roomRef.setValue(["name": name, "code": code, "maxScore": maxScore, "groups": encodedGroups])
+        roomRef.updateChildValues(["name": name, "code": code, "maxScore": intMaxScore, "groups": encodedGroups])
         // Go back to the room
         performSegue(withIdentifier: "backToRoom", sender: self)
     }
