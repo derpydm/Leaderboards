@@ -87,7 +87,7 @@ class NewRoomTableViewController: UITableViewController {
         if maxScore == "" {
             maxScore = "1000"
         }
-        guard Int(maxScore) != nil else {
+        guard let intMaxScore = Int(maxScore) else {
             let alert = UIAlertController(title: "Invalid Max Score", message: "Max score must be an integer!", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alert, animated: true)
@@ -106,7 +106,7 @@ class NewRoomTableViewController: UITableViewController {
         self.roomRef.child("name").setValue(name)
         self.roomRef.child("code").setValue(code)
         self.roomRef.child("groups").setValue(groups)
-        self.roomRef.child("maxScore").setValue(maxScore)
+        self.roomRef.child("maxScore").setValue(intMaxScore)
         
         
         performSegue(withIdentifier: "unwindFromNewToHome", sender: self)
